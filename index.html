@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link href="../bower_components/codemirror/lib/codemirror.css" rel="stylesheet"></link>
+    <link href="../bower_components/codemirror/theme/base16-light.css" rel="stylesheet"></link>
+    <style>
+    #input {
+      display: none;
+    }
+    #input, .CodeMirror {
+      position: absolute;
+      resize: none;
+    }
+    #chart {
+      position: relative;
+    }
+    #error {
+      color: red;
+      position: relative;
+      top: -8px;
+    }
+    </style>
+  </head>
+
+  <body>
+    <textarea id='input'></textarea>
+
+    <div id='chart'></div>
+
+    <div id='error'></div>
+
+    <script src='bower_components/d3/d3.min.js' charset='UTF-8'></script>
+    <script>
+        var require = {
+          baseUrl: 'bower_components',
+          paths: {
+            'jquery': 'jquery/jquery.min',
+            'underscore': 'underscore/underscore-min',
+            'd3': 'd3/d3.min',
+            'vega': 'vega/vega',
+            'js-yaml': 'js-yaml/js-yaml',
+            'codemirror': 'codemirror/lib/codemirror',
+            'codemirror-yaml': 'codemirror/mode/yaml/yaml'
+          },
+          packages: [
+            {name: 'plotify', location: '../build'},
+          ],
+          shim: {
+            'jquery': { exports: '$' },
+            'underscore': { exports: '_' },
+            'd3': { exports: 'd3' },
+            'vega': { exports: 'vg' },
+            'codemirror': { exports: 'CodeMirror' },
+            'codemirror-yaml': ['codemirror']
+          }
+        };
+    </script>
+    <script data-main="plotify" src="./bower_components/requirejs/require.js"></script>
+  </body>
+</html>

@@ -1,0 +1,164 @@
+/// <reference path="declarations"/>
+
+import $ = require('jquery');
+import _ = require('underscore');
+
+// Error codes
+export var ERR_BAD_VALUE = 0;
+export var ERR_MISSING_PROP = 1;
+export var ERR_EXTRA_PROP = 2;
+
+export class Error {
+  constructor(public code: number, public path: string[], public message: string) {}
+}
+
+class Input {
+  constructor(public val: any, public path?: string[]) {
+    this.path = path || [];
+  }
+}
+
+interface Parser<T> {
+  (input: Input): T;
+  map<R>(f:(t:T) => R): Parser<R>;
+}
+
+function parser<T>(f:(input: Input) => T): Parser<T> {
+  var p = <Parser<T>>function(input: Input) {
+    return f(input);
+  };
+  function map<R>(g:(t:T) => R): Parser<R> {
+    return parser(input => {
+      return g(f(input));
+    });
+  }
+  p.map = map;
+  return p;
+}
+
+function parseAtom(expectedType?: string): Parser<any> {
+  return parser(input => {
+    if (typeof expectedType !== 'undefined') {
+      var actualType = $.type(input.val);
+      if (actualType !== expectedType)
+        throw new Error(ERR_BAD_VALUE, input.path, 'expected ' + expectedType + ' but found ' + actualType);
+    }
+    return input.val;
+  });
+}
+
+function parseProp<T>(prop: any, optional?: boolean, parseInner?: Parser<T>): Parser<T> {
+  if (typeof optional === 'undefined')
+    optional = false;
+  if (typeof parseInner === 'undefined')
+    parseInner = parseAtom();
+  return parser(input => {
+    var val = parseAtom()(input);
+    var path = input.path;
+    if (!(prop in val))
+      if (optional)
+        return undefined;
+      else
+        throw new Error(ERR_MISSING_PROP, path, 'missing required property: ' + prop);
+    var propVal = val[prop];
+    return parseInner(new Input(propVal, path.concat([prop])));
+  });
+}
+
+function parseArray<T>(parseInner?: Parser<T>): Parser<T[]> {
+  if (typeof parseInner === 'undefined')
+    parseInner = parseAtom();
+  return parser(input => {
+    return <T[]>parseAtom('array')(input).map((val, idx) =>
+      parseProp(idx, false, parseInner)(input)
+    );
+  });
+}
+
+function parseOneOf<T>(possibilities: T[]): Parser<T> {
+  return parser(input => {
+    if (possibilities.indexOf(input.val) < 0)
+      throw new Error(ERR_BAD_VALUE, input.path, 'must be one of: ' + possibilities.join(', '));
+    return <T>input.val;
+  });
+}
+
+function checkExtra<T>(input: Input, result: T): T {
+  for (var prop in input.val)
+    if (!(prop in result))
+      throw new Error(ERR_EXTRA_PROP, input.path, 'unrecognized property: ' + prop);
+  return result;
+}
+
+// plotify-specific parsers
+
+var scaleTypes = [
+  'categorical',
+  'linear',
+  'log',
+  'pow',
+  'sqrt',
+  // 'quantile',
+  // 'quantize',
+  // 'threshold',
+  'time',
+  'utc',
+  'ordinal'
+];
+
+function parseAesMap<T>(parseInner: Parser<T>): Parser<AesMap<T>> {
+  return parser(input => {
+    var aes: AesMap<T> = {};
+    function get(prop: string) {
+      var val = parseProp(prop, true, parseInner)(input);
+      if (typeof val !== 'undefined')
+        aes[prop] = val;
+    }
+    get('x');
+    get('y');
+    get('color');
+    get('size');
+    get('shape');
+    return checkExtra(input, aes);
+  });
+}
+
+var parseData: Parser<any[]> = parseAtom();
+
+var parseMapping: Parser<Mapping> = parseAesMap(parseAtom('string'));
+
+var parseScale: Parser<Scale> = parser(input => {
+  var scale: Scale = {};
+  // optional
+  scale.type = parseProp('type', true, parseOneOf(scaleTypes))(input);
+  scale.domain = parseProp('domain', true, parseArray())(input);
+  return checkExtra(input, scale);
+});
+
+var parseScales: Parser<Scales> = parseAesMap(parseScale);
+
+function parseLayer(geomTypes: string[]): Parser<Layer> {
+  return parser(input => {
+    var layer: Layer = {
+      type: parseProp('type', false, parseOneOf(geomTypes))(input),
+      mapping: parseProp('mapping', true, parseMapping)(input) || {}
+    };
+    return checkExtra(input, layer);
+  });
+}
+
+function parsePlot(geomTypes: string[]): Parser<Plot> {
+  return parser(input => {
+    var plot: Plot = {
+      layers: parseProp('layers', false, parseArray(parseLayer(geomTypes)))(input),
+      data: parseProp('data', true, parseData)(input) || [],
+      mapping: parseProp('mapping', true, parseMapping)(input) || {},
+      scales: {}//parseProp('scales', true, parseScales)(input) || {}
+    };
+    return checkExtra(input, plot);
+  });
+}
+
+export function parse(json: any, config: Config) {
+  return parsePlot(_.keys(config.geometries))(new Input(json));
+}

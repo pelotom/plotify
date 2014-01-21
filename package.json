@@ -1,0 +1,26 @@
+{
+  "name": "Plotify",
+  "version": "0.0.0",
+  "description": "A grammar of graphics for JavaScript",
+  "main": "Gruntfile.js",
+  "scripts": {
+    "test": "grunt nodeunit"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "keywords": [
+    "visualization"
+  ],
+  "readmeFilename": "README.md",
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-contrib-jshint": "~0.6.0",
+    "grunt-contrib-watch": "~0.4.4",
+    "grunt-contrib-requirejs": "~0.4.1",
+    "grunt-typescript": "~0.2.4",
+    "DefinitelyTyped": "git://github.com/borisyankov/DefinitelyTyped.git#master",
+    "grunt-release": "~0.6.0"
+  }
+}
