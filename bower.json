@@ -1,0 +1,32 @@
+{
+  "name": "plotify",
+  "version": "0.0.0",
+  "homepage": "https://github.com/pelotom/plotify",
+  "authors": [
+    "Tom Crockett <pelotom@gmail.com>"
+  ],
+  "description": "A simple grammar of graphics for JavaScript",
+  "main": "plotify.min.js",
+  "keywords": [
+    "plot",
+    "chart",
+    "visualization"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "requirejs": "~2.1.10",
+    "jquery": "~2.0.3",
+    "underscore": "~1.5.2",
+    "d3": "~3.4.1",
+    "vega": "~1.3.3",
+    "codemirror": "~3.21.0",
+    "js-yaml": "~3.0.1"
+  }
+}
