@@ -44,20 +44,17 @@ function setSize() {
     codeMirror.setSize(ratio*w, h);
 
     var pad = view.padding();
-    var availWidth = (1-ratio) * w - pad.left - pad.right - 20;
-    var availHeight = h - pad.top - pad.bottom + 10;
+    var viewWidth = (1-ratio) * w - pad.left - pad.right - 20;
+    var viewHeight = h - pad.top - pad.bottom + 10;
 
     var scales = _.object((<Vega.Scale[]>view['_model']['_defs']['marks']['scales']).map(s => [s.name, s.name]));
-    var viewWidth = 'x' in scales ? availWidth : 0,
-        viewHeight = 'y' in scales ? availHeight : 0;
     view
       .width(viewWidth)
       .height(viewHeight)
       .update();
 
     $chart.css({
-      'margin-left': ratio*w + 5 + (availWidth - viewWidth)/2,
-      'margin-top': (availHeight - viewHeight)/2 
+      'margin-left': ratio*w + 5
     });
   }
 }
