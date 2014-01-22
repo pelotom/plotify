@@ -78,3 +78,6 @@ defaults['bar'] = {
     return mkMark('rect', set);
   }
 };
+
+// 'point' is an alias for 'symbol'
+defaults['point'] = defaults['symbol'];
