@@ -63,6 +63,17 @@ _.each(vegaTypes, type => {
   };
 });
 
+
+// 'point' is an alias for 'symbol'
+defaults['point'] = defaults['symbol'];
+// use 'polygon' to get a filled line
+defaults['polygon'] = _.extend({}, defaults['line']);
+defaults['line'].generate = args => {
+  var result = defaults['polygon'].generate(args);
+  delete result.properties.update.fill;
+  return result;
+};
+
 defaults['bar'] = {
   aesthetics: U.basicAesthetics,
   generate: args => {
@@ -84,6 +95,3 @@ defaults['bar'] = {
     return mkMark('rect', set);
   }
 };
-
-// 'point' is an alias for 'symbol'
-defaults['point'] = defaults['symbol'];
