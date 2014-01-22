@@ -60,8 +60,9 @@ export function genSpec(plot: Plot, config: Config): Vega.Spec {
     // legends: [
     //   {
     //     title: 'foo',
-    //     fill: 'color',
-    //     stroke: 'color',
+    //     fill: 'fill',
+    //     stroke: 'fill',
+    //     offset: 50
     //   }
     // ],
     marks: plot.layers.map(layer => {
