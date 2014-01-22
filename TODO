@@ -1,4 +1,5 @@
 - multiple data sets
+- legends
 - assume unrecognized layer-level properties are mapping properties
 - make height, width work for bar charts
 - make 'point' an alias to 'symbol'
@@ -6,3 +7,5 @@
 
 Error reporting
 - when variables not present in data are used
+- when an aesthetic is associated with a constant not present in its scale's range
+- when a discrete aesthetic (e.g. shape) is associated with a continuous variable
