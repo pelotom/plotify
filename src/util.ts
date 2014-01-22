@@ -56,7 +56,7 @@ export var scaleInfos: { [scale: string]: ScaleInfo } = {
   },
 };
 
-var scaleNames = _.keys(scaleInfos);
+export var scaleNames = _.keys(scaleInfos);
 
 // Usually the scale name is the same as the aesthetic; if not
 // the mapping is stored in this table
@@ -107,7 +107,7 @@ export var scalarAttrs = scaleNames.concat(_.keys(scaledAesthetics));
 export var basicAesthetics = scalarAttrs.concat(unscaledAesthetics);
 
 // For a given aesthetic, tells which scale it belongs to.
-function scaleFor(aesthetic: string) {
+export function scaleFor(aesthetic: string) {
   if (unscaledAesthetics.indexOf(aesthetic) >= 0)
     return undefined;
   return scaledAesthetics[aesthetic] || aesthetic;
