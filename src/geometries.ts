@@ -67,11 +67,11 @@ defaults['bar'] = {
     var xScale = 'x', yScale = 'y';
     if (isCat('x') && !isCat('y')) {
       set.x.scale = 'x-bands';
-      set.width = {scale: 'x-bands', band: true, offset: -1};
+      set.width = U.mkVar(mapping, 'width') || {scale: 'x-bands', band: true, offset: -1};
       set.y2 = U.mkVar(mapping, 'y2') || {scale: 'y', value: 0};
     } else if (isCat('y') && !isCat('x')) {
       set.y.scale = 'y-bands';
-      set.height = {scale: 'y-bands', band: true, offset: -1};
+      set.height = U.mkVar(mapping, 'height') || {scale: 'y-bands', band: true, offset: -1};
       set.x2 = U.mkVar(mapping, 'x2') || {scale: 'x', value: 0};
     } else throw 'A bar chart requires one discrete and one continuous spacial dimension';
     set.fill = U.mkVar(mapping, 'fill');
