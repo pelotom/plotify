@@ -38,8 +38,10 @@ function setSize() {
     $chart.css({
       'margin-left': ratio*w + 5
     });
+    var pad = view.padding();
+    var viewWidth = (1-ratio) * w - pad.left - pad.right - 20;
     view
-      .width((1-ratio) * w - 100)
+      .width(viewWidth)
       .height(h - 30)
       .update();
   }
@@ -58,7 +60,7 @@ function makeChart(input: string) {
       view = chart({
         el: $chart[0],
         renderer: 'svg'
-      });
+      }).update();
       setSize();
     });
   } catch (e) {
