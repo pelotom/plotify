@@ -25,18 +25,22 @@ var vegaTypes = [
 ];
 
 _.each(vegaTypes, type => {
-  var defaultVals = {
+  var defaultVals:{[geom:string]:Vega.Mark.ValueRef} = {
     symbol: {
-      fill: 'black',
-      shape: 'circle'
+      fill: U.mkVal('black'),
+      shape: U.mkVal('circle')
     },
     line: {
-      stroke: 'black',
-      strokeWidth: 2
+      stroke: U.mkVal('black'),
+      strokeWidth: U.mkVal(2)
     },
     text: {
-      fill: 'black',
-      text: 'label'
+      fill: U.mkVal('black'),
+      text: U.mkVal('label')
+    },
+    area: {
+      x2: {scale: 'x', value: 0},
+      y2: {scale: 'y', value: 0}
     }
   };
   defaults[type] = {
@@ -49,7 +53,7 @@ _.each(vegaTypes, type => {
         if (typeof val !== 'undefined')
           set[aes] = U.mkVar(mapping, aes);
         else if (type in defaultVals && aes in defaultVals[type])
-          set[aes] = U.mkVal(defaultVals[type][aes]);
+          set[aes] = defaultVals[type][aes];
       });
       return mkMark(type, set);
     }
