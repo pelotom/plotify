@@ -32,16 +32,16 @@ function genScales(plot: Plot, scaleName: string): Vega.Scale[] {
 }
 
 function genAxes(scales: Vega.Scale[]) {
-  return scales.map(s => s.name).filter(name => {
-    switch (name) {
+  return scales.filter(s => {
+    switch (s.name) {
     case 'x':
     case 'y':
       return true;
     default:
       return false;
     }
-  }).map(name => {
-    return {type:name, scale:name};
+  }).map(s => {
+    return {type: s.name, scale: s.name, grid: s.type !== 'ordinal'};
   });
 }
 
