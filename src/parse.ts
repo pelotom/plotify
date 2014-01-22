@@ -106,26 +106,28 @@ var scaleTypes = [
   'ordinal'
 ];
 
-function parseAesMap<T>(parseInner: Parser<T>): Parser<AesMap<T>> {
+function parseAesMap<T>(aesthetics: string[], parseInner: Parser<T>): Parser<AesMap<T>> {
   return parser(input => {
-    var aes: AesMap<T> = {};
+    var map: AesMap<T> = {};
     function get(prop: string) {
       var val = parseProp(prop, true, parseInner)(input);
       if (typeof val !== 'undefined')
-        aes[prop] = val;
+        map[prop] = val;
     }
-    get('x');
-    get('y');
-    get('color');
-    get('size');
-    get('shape');
-    return checkExtra(input, aes);
+    _.each(aesthetics, aes => {
+      var val = parseProp(aes, true, parseInner)(input);
+      if (typeof val !== 'undefined')
+        map[aes] = val;  
+    });
+    return checkExtra(input, map);
   });
 }
 
 var parseData: Parser<any[]> = parseAtom();
 
-var parseMapping: Parser<Mapping> = parseAesMap(parseAtom('string'));
+function parseMapping(aesthetics: string[]): Parser<Mapping> {
+  return parseAesMap(aesthetics, parseAtom('string'));
+}
 
 var parseScale: Parser<Scale> = parser(input => {
   var scale: Scale = {};
@@ -135,24 +137,26 @@ var parseScale: Parser<Scale> = parser(input => {
   return checkExtra(input, scale);
 });
 
-var parseScales: Parser<Scales> = parseAesMap(parseScale);
+function parseScales(aesthetics: string[]): Parser<Scales> {
+  return parseAesMap(aesthetics, parseScale);
+}
 
-function parseLayer(geomTypes: string[]): Parser<Layer> {
+function parseLayer(geomTypes: string[], aesthetics: string[]): Parser<Layer> {
   return parser(input => {
     var layer: Layer = {
       type: parseProp('type', false, parseOneOf(geomTypes))(input),
-      mapping: parseProp('mapping', true, parseMapping)(input) || {}
+      mapping: parseProp('mapping', true, parseMapping(aesthetics))(input) || {}
     };
     return checkExtra(input, layer);
   });
 }
 
-function parsePlot(geomTypes: string[]): Parser<Plot> {
+function parsePlot(geomTypes: string[], aesthetics: string[]): Parser<Plot> {
   return parser(input => {
     var plot: Plot = {
-      layers: parseProp('layers', false, parseArray(parseLayer(geomTypes)))(input),
+      layers: parseProp('layers', false, parseArray(parseLayer(geomTypes, aesthetics)))(input),
       data: parseProp('data', true, parseData)(input) || [],
-      mapping: parseProp('mapping', true, parseMapping)(input) || {},
+      mapping: parseProp('mapping', true, parseMapping(aesthetics))(input) || {},
       scales: {}//parseProp('scales', true, parseScales)(input) || {}
     };
     return checkExtra(input, plot);
@@ -160,5 +164,6 @@ function parsePlot(geomTypes: string[]): Parser<Plot> {
 }
 
 export function parse(json: any, config: Config) {
-  return parsePlot(_.keys(config.geometries))(new Input(json));
+  var geoms = config.geometries;
+  return parsePlot(_.keys(geoms), _.flatten(_.values(geoms).map((geom: Geometry) => geom.aesthetics)))(new Input(json));
 }

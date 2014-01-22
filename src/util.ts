@@ -4,62 +4,144 @@ import _ = require('underscore');
 
 export var DATA_NAME = 'data';
 
-export var scaleInfos: { [scale: string]: ScaleInfo } = {};
-scaleInfos['x'] = {
-  defaultRange: 'width'
-};
-scaleInfos['y'] = {
-  defaultRange: 'height'
-};
-scaleInfos['color'] = {
-  defaultRange: 'category10'
-};
-scaleInfos['size'] = {
-  defaultRange: [10, 100]
-};
-scaleInfos['shape'] = {
-  defaultRange: [
-    'circle',
-    'square',
-    'cross',
-    'diamond',
-    'triangle-up',
-    'triangle-down'
-  ]
+var DEFAULT_OPACITY_RANGE = [0,1];
+var DEFAULT_COLOR_RANGE = 'category10';
+
+export var scaleInfos: { [scale: string]: ScaleInfo } = {
+  x: {
+    defaultRange: 'width'
+  },
+  y: {
+    defaultRange: 'height'
+  },
+  opacity: {
+    defaultRange: DEFAULT_OPACITY_RANGE
+  },
+  fill: {
+    defaultRange: DEFAULT_COLOR_RANGE
+  },
+  fillOpacity: {
+    defaultRange: DEFAULT_OPACITY_RANGE
+  },
+  stroke: {
+    defaultRange: DEFAULT_COLOR_RANGE
+  },
+  strokeWidth: {
+    defaultRange: [1,15]
+  },
+  strokeOpacity: {
+    defaultRange: DEFAULT_OPACITY_RANGE
+  },
+  strokeDash: {
+    defaultRange: [
+      [5,5],
+      [10,10],
+      [20,10,5,5,5,10]
+    ]
+  },
+
+  // -- symbol
+  size: {
+    defaultRange: [10, 1000]
+  },
+  shape: {
+    defaultRange: [
+      'circle',
+      'square',
+      'cross',
+      'diamond',
+      'triangle-up',
+      'triangle-down'
+    ]
+  },
 };
 
-// Find the appropriate range for a given scale
-function rangeFor(scaleName: string) {
-  return scaleInfos[aestheticFor(scaleName)];
-}
+var scaleNames = _.keys(scaleInfos);
+
+// Usually the scale name is the same as the aesthetic; if not
+// the mapping is stored in this table
+var scaledAesthetics = {
+  x2: 'x',
+  y2: 'y',
+};
+
+var unscaledAesthetics = [
+  'height',
+  'width',
+  'strokeDashOffset',
+
+  // -- path
+  // 'path',
+
+  // -- arc
+  'innerRadius',
+  'outerRadius',
+  'startAngle',
+  'endAngle',
+
+  // -- area / line
+  'interpolate',
+  'tension',
+
+  // -- image / text
+  'align',
+  'baseline',
+
+  // -- image
+  'url',
+
+  // -- text
+  'text',
+  'dx',
+  'dy',
+  'angle',
+  'font',
+  'fontSize',
+  'fontWeight',
+  'fontStyle'
+]
 
 // The aesthetic attributes to which scales may be attached
-export var scalarAttrs = _.keys(scaleInfos);
+export var scalarAttrs = scaleNames.concat(_.keys(scaledAesthetics));
 
-// For a given geometric attribute, tells which aesthetic domain it belongs to.
-export function aestheticFor(attr: string) {
-  // Usually the aesthetic domain is the same as the geometric attribute; if not
-  // the mapping is stored in this table
-  var exceptions = {
-    x2: 'x',
-    y2: 'y',
-  };
-  return exceptions[attr] || attr;
+export var basicAesthetics = scalarAttrs.concat(unscaledAesthetics);
+
+// For a given aesthetic, tells which scale it belongs to.
+function scaleFor(aesthetic: string) {
+  if (unscaledAesthetics.indexOf(aesthetic) >= 0)
+    return undefined;
+  return scaledAesthetics[aesthetic] || aesthetic;
+}
+
+// Find the appropriate range for a given scale
+function rangeFor(aesthetic: string) {
+  var scale = scaleFor(aesthetic);
+  if (!scale)
+    throw 'No scale found for aesthetic: ' + aesthetic;
+  return scaleInfos[scale];
 }
 
 export function mkVal(v: any): Vega.Mark.ValueRef {
   return { value: v };
 }
 
-export function mkVar(mapping: Mapping, attribute: string, defaultVal?: any): Vega.Mark.ValueRef {
-  if (attribute in mapping) {
-    var mappedTo: string = mapping[attribute];
-    if (mappedTo.indexOf('$') === 0)
-      return { scale: aestheticFor(attribute), field: 'data.' + mappedTo.substring(1) };
-    else
-      return mkVal(mappedTo);
+export function mkVar(mapping: Mapping, aesthetic: string): Vega.Mark.ValueRef {
+  if (aesthetic in mapping) {
+    var mappedTo: string = mapping[aesthetic];
+    var scale = scaleFor(aesthetic);
+    
+    var valRef: Vega.Mark.ValueRef;
+    if (mappedTo.indexOf('$') === 0) {
+      valRef = { field: 'data.' + mappedTo.substring(1) };
+      if (scale)
+        valRef.scale = scale;
+    } else {
+      valRef = mkVal(mappedTo);
+      if (scale === 'x' || scale === 'y')
+        valRef.scale = scale;
+    }
+
+    return valRef;
   }
-  if (typeof defaultVal !== 'undefined')
-    return mkVal(defaultVal);
-  throw 'Unable to define ValueRef: ' + attribute;
+  return undefined;
 }

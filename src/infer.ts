@@ -43,19 +43,6 @@ function inferScales(plot: Plot): Scales {
     if (!!p[1]) result[p[0]] = p[1];
   });
   return result;
-  // [
-  //   {name:'x', type:'ordinal', range:'width', domain: { data: U.DATA_NAME, field: 'data.x' }},
-  //   {name:'y', range:'height', nice:true, domain: { data: U.DATA_NAME, field:'data.y' }},
-  //   {name:'color', type: 'ordinal', domain: { data: U.DATA_NAME, field:'data.z' }, range:'category10'},
-  //   {name:'shape', type: 'ordinal', domain: { data: U.DATA_NAME, field:'data.z' }, range:[
-  //     'circle',
-  //     'square',
-  //     'cross',
-  //     'diamond',
-  //     'triangle-up',
-  //     'triangle-down'
-  //   ]}
-  // ];
 }
 
 function inferLayers(plot: Plot): Layer[] {

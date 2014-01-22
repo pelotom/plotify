@@ -74,6 +74,7 @@ declare module Geometry {
 }
 
 interface Geometry {
+  aesthetics: string[];
   generate(args: Geometry.GenerateArgs): Vega.Mark;
 }
 

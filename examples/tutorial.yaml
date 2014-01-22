@@ -11,6 +11,6 @@ data:
 mapping:
   x: $x
   y: $y
-  color: steelblue
+  fill: steelblue
 layers:
   - type: bar
