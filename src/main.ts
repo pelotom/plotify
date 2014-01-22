@@ -3,6 +3,7 @@
 /// <amd-dependency path='js-yaml'/>
 
 import $ = require('jquery');
+import _ = require('underscore');
 import vg = require('vega');
 import CodeMirror = require('codemirror');
 import JsYaml = require('js-yaml');
@@ -41,15 +42,23 @@ function setSize() {
     var w = $win.width();
     var h = $win.height() - 40;
     codeMirror.setSize(ratio*w, h);
-    $chart.css({
-      'margin-left': ratio*w + 5
-    });
+
     var pad = view.padding();
-    var viewWidth = (1-ratio) * w - pad.left - pad.right - 20;
+    var availWidth = (1-ratio) * w - pad.left - pad.right - 20;
+    var availHeight = h - pad.top - pad.bottom + 10;
+
+    var scales = _.object((<Vega.Scale[]>view['_model']['_defs']['marks']['scales']).map(s => [s.name, s.name]));
+    var viewWidth = 'x' in scales ? availWidth : 0,
+        viewHeight = 'y' in scales ? availHeight : 0;
     view
       .width(viewWidth)
-      .height(h - 30)
+      .height(viewHeight)
       .update();
+
+    $chart.css({
+      'margin-left': ratio*w + 5 + (availWidth - viewWidth)/2,
+      'margin-top': (availHeight - viewHeight)/2 
+    });
   }
 }
 
