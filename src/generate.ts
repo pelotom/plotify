@@ -31,6 +31,20 @@ function genScales(plot: Plot, scaleName: string): Vega.Scale[] {
   return results;
 }
 
+function genAxes(scales: Vega.Scale[]) {
+  return scales.map(s => s.name).filter(name => {
+    switch (name) {
+    case 'x':
+    case 'y':
+      return true;
+    default:
+      return false;
+    }
+  }).map(name => {
+    return {type:name, scale:name};
+  });
+}
+
 export function genSpec(plot: Plot, config: Config): Vega.Spec {
   var scales = _.flatten(_.keys(plot.scales).map(scaleName => genScales(plot, scaleName)));
 
@@ -42,10 +56,7 @@ export function genSpec(plot: Plot, config: Config): Vega.Spec {
       }
     ],
     scales: scales,
-    axes: [
-      {type:'x', scale:'x'},
-      {type:'y', scale:'y'}
-    ],
+    axes: genAxes(scales),
     // legends: [
     //   {
     //     title: 'foo',
