@@ -1,0 +1,7 @@
+- assume unrecognized layer-level properties are mapping properties
+- make height, width work for bar charts
+- make 'point' an alias to 'symbol'
+- allow using ValueRefs to be explicit?
+
+Error reporting
+- 
