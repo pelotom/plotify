@@ -25,8 +25,14 @@ var codeMirror = CodeMirror.fromTextArea(<HTMLTextAreaElement>$('#input')[0], {
   theme: 'base16-light',
   indentUnit: 2,
   smartIndent: true,
-  tabSize: 2,
-  lineWrapping: true
+  indentWithTabs: false,
+  lineWrapping: true,
+  extraKeys: {
+    Tab: function(cm) {
+      var spaces = new Array(cm.getOption("indentUnit") + 1).join(" ");
+      cm.replaceSelection(spaces, "end", "+input");
+    }
+  }
 });
 
 function setSize() {
