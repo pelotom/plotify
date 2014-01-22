@@ -16,7 +16,7 @@ export var defaults: Geometries = {};
 var vegaTypes = [
   'rect',
   'symbol',
-  'path',
+  // 'path',
   'arc',
   'area',
   'line',
