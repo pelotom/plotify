@@ -1,7 +1,6 @@
 - multiple data sets
 - legends
 - assume unrecognized layer-level properties are mapping properties
-- make height, width work for bar charts
 - allow using ValueRefs to be explicit?
 
 Error reporting
