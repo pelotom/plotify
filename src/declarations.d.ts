@@ -24,15 +24,7 @@ declare module 'js-yaml' {
 
 // A mapping of aesthetic attributes to something
 interface AesMap<T> {
-  // Primary aesthetics -- correspond to scales
-  x?: T;
-  y?: T;
-  color?: T;
-  size?: T;
-  shape?: T;
-  // Secondary aesthetics
-  x2?: T;
-  y2?: T;
+  [aes: string]: T;
 }
 
 interface Scale {
