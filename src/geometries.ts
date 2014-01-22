@@ -26,6 +26,9 @@ var vegaTypes = [
 
 _.each(vegaTypes, type => {
   var defaultVals:{[geom:string]:Vega.Mark.ValueRef} = {
+    rect: {
+      fill: U.mkVal('black')
+    },
     symbol: {
       fill: U.mkVal('black'),
       shape: U.mkVal('circle')
@@ -65,7 +68,7 @@ defaults['bar'] = {
   generate: args => {
     var mapping = args.mapping;
     var isCat = args.isCategorical;
-    var set: Vega.Mark.PropertySet = {};
+    var set: Vega.Mark.PropertySet = _.extend({}, defaults['rect'].generate(args).properties.update);
     set.x = U.mkVar(mapping, 'x');
     set.y = U.mkVar(mapping, 'y');
     var xScale = 'x', yScale = 'y';
@@ -78,7 +81,6 @@ defaults['bar'] = {
       set.height = U.mkVar(mapping, 'height') || {scale: 'y-bands', band: true, offset: -1};
       set.x2 = U.mkVar(mapping, 'x2') || {scale: 'x', value: 0};
     } else throw 'A bar chart requires one discrete and one continuous spacial dimension';
-    set.fill = U.mkVar(mapping, 'fill');
     return mkMark('rect', set);
   }
 };
