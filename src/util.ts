@@ -131,7 +131,7 @@ export function mkVar(mapping: Mapping, aesthetic: string): Vega.Mark.ValueRef {
     var scale = scaleFor(aesthetic);
     
     var valRef: Vega.Mark.ValueRef;
-    if (mappedTo.indexOf('$') === 0) {
+    if (typeof mappedTo === 'string' && mappedTo.indexOf('$') === 0) {
       valRef = { field: 'data.' + mappedTo.substring(1) };
       if (scale)
         valRef.scale = scale;

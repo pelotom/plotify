@@ -126,7 +126,7 @@ function parseAesMap<T>(aesthetics: string[], parseInner: Parser<T>): Parser<Aes
 var parseData: Parser<any[]> = parseAtom();
 
 function parseMapping(aesthetics: string[]): Parser<Mapping> {
-  return parseAesMap(aesthetics, parseAtom('string'));
+  return parseAesMap(aesthetics, parseAtom());
 }
 
 var parseScale: Parser<Scale> = parser(input => {

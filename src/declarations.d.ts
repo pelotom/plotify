@@ -43,7 +43,7 @@ interface Scale {
 }
 
 // Maps aesthetics to data variables
-interface Mapping extends AesMap<string> {}
+interface Mapping extends AesMap<any> {}
 
 // Maps primary aesthetics to their corresponding scale configuration
 interface Scales extends AesMap<Scale> {}

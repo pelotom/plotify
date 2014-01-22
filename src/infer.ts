@@ -9,8 +9,8 @@ function inferScale(plot: Plot, scaleName: string): Scale {
     _.flatten([plot.mapping].concat(plot.layers.map(layer => layer.mapping))
       .map(mapping => {
         if (mapping && scaleName in mapping) {
-          var mapsTo: string = mapping[scaleName];
-          if (mapsTo.indexOf('$') === 0)
+          var mapsTo = mapping[scaleName];
+          if (typeof mapsTo === 'string' && mapsTo.indexOf('$') === 0)
             return [mapsTo.substring(1)];
         }
         return [];
