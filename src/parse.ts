@@ -55,7 +55,7 @@ function parseProp<T>(prop: any, optional?: boolean, parseInner?: Parser<T>): Pa
   return parser(input => {
     var val = parseAtom()(input);
     var path = input.path;
-    if (!(prop in val))
+    if (!val || !(prop in val))
       if (optional)
         return undefined;
       else
