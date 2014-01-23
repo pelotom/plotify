@@ -45,9 +45,18 @@ interface Layer {
   mapping: Mapping;
 }
 
+interface RtDatum {
+  [key: string]: any
+}
+
+interface RtDataSets {
+  [name: string]: RtDatum[];
+}
+
 interface Plot {
+  dataSets: Vega.Data[];
+  rtDataSets?: RtDataSets;
   layers: Layer[];
-  data: Vega.Data[];
   mapping: Mapping;
   scales: Scales;
 }

@@ -24,7 +24,7 @@ export function match<T>(expr: Expr, ifConst: (c: Const) => T, ifVar: (v: Var) =
     return ifVar(<Var>expr);
 }
 
-export function parse(dataSet: Vega.Data[], input: any): Expr {
+export function parse(dataSet: RtDatum[], input: any): Expr {
   if (typeof input !== 'string' || input.indexOf('$') !== 0) {
     return {
       type: Type.constant,

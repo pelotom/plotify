@@ -1,12 +1,6 @@
 data:
 - name: table
-  format: { "type": "json", "property": "foo" }
   url: examples/testdata.json
-  transform:
-  - type: copy
-    from: data.z
-    fields: ["foo"]
-    as: ["blorg"]
 mapping:
   x: $x
   y: $y
