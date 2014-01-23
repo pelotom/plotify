@@ -123,7 +123,30 @@ function parseAesMap<T>(aesthetics: string[], parseInner: Parser<T>): Parser<Aes
   });
 }
 
-var parseData: Parser<any[]> = parseAtom();
+var parseDataFormat: Parser<Vega.Data.Format> = parser(input => {
+  var fmt: Vega.Data.Format = {
+    type: parseProp('type', true, parseAtom('string'))(input)
+  };
+  return _.extend(fmt, input.val);
+});
+
+var parseDataTransform: Parser<Vega.Data.Transform> = parser(input => {
+  // TODO
+  return _.extend({}, input.val);
+})
+
+var parseData: Parser<Vega.Data> = parser(input => {
+  return {
+    name: parseProp('name', false, parseAtom('string'))(input),
+    format: parseProp('format', true, parseDataFormat)(input),
+    values: parseProp('values', true, parseAtom())(input),
+    source: parseProp('source', true, parseAtom('string'))(input),
+    url: parseProp('url', true, parseAtom('string'))(input),
+    transform: parseProp('transform', true, parseArray(parseDataTransform))(input)
+  };
+});
+
+var parseDataSet: Parser<Vega.Data[]> = parseArray(parseData);
 
 function parseMapping(aesthetics: string[]): Parser<Mapping> {
   return parseAesMap(aesthetics, parseAtom());
@@ -155,7 +178,7 @@ function parsePlot(geomTypes: string[], aesthetics: string[]): Parser<Plot> {
   return parser(input => {
     var plot: Plot = {
       layers: parseProp('layers', false, parseArray(parseLayer(geomTypes, aesthetics)))(input),
-      data: parseProp('data', true, parseData)(input) || [],
+      data: parseProp('data', true, parseDataSet)(input) || [],
       mapping: parseProp('mapping', true, parseMapping(aesthetics))(input) || {},
       scales: {}//parseProp('scales', true, parseScales)(input) || {}
     };

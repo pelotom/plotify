@@ -7,19 +7,19 @@ import U = require('./util');
 function inferScale(plot: Plot, scaleName: string): Scale {
   var mappings = [plot.mapping].concat(plot.layers.map(layer => layer.mapping));
   var vals = _.unique(_.flatten(mappings.map(m => {
-    return _.flatten(_.keys(m).map(aes => {
+    return _.keys(m).map(aes => {
       if (U.scaleFor(aes) === scaleName) {
         var mapsTo = m[aes];
         if (typeof mapsTo === 'string' && mapsTo.indexOf('$') === 0)
           // variable
-          return plot.data.map(d => d[mapsTo.substring(1)]);
+          return plot.data.map(data => data.values.map(d => d[mapsTo.substring(1)]));
         else
           // constant
           return [mapsTo];
       }
       return []; 
-    }));
-  }), true));
+    });
+  })));
   if (vals.length === 0)
     return undefined;
   var scale: Scale = {};

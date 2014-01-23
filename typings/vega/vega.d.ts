@@ -11,6 +11,7 @@ declare module Vega {
   export interface Parse {
     spec(url: string, callback: (chart: (args: ViewArgs) => View) => void);
     spec(spec: Spec, callback: (chart: (args: ViewArgs) => View) => void);
+    data(dataSet: Vega.Data[], callback: () => void);
   }
 
   export interface ViewArgs {
@@ -210,13 +211,19 @@ declare module Vega {
     type: string;
     name?: string;
     description?: string;
-    from?: any;
+    from?: Mark.From;
     properties: Mark.PropertySets;
     key?: string;
     delay?: Mark.ValueRef;
   }
 
   export module Mark {
+    export interface From {
+      // TODO docs
+      data?: string;
+      transform?: Data.Transform[];
+    }
+
     export interface PropertySets {
       // TODO docs
       enter?: PropertySet;

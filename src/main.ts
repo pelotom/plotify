@@ -62,8 +62,18 @@ function setSize() {
 $win.resize(setSize);
 
 function makeChart(input: string) {
+  var plot;
   try {
-    var plot = Parse.parse(JsYaml.safeLoad(input), config);
+    plot = Parse.parse(JsYaml.safeLoad(input), config);
+  } catch (e) {
+    var err: Parse.Error = e;
+    $error.text('[' + ['spec'].concat(err.path).join('.') + '] ' + err.message);
+  }
+  var dataParse = window['dataParse'] = vg.parse.data(plot.data, () => {
+    plot.data = _.pairs(dataParse.load).map(keyValue => {
+      return {name: keyValue[0], values: keyValue[1]};  
+    });
+    console.log(JSON.stringify(plot.data, null, 4));
     plot = Infer.infer(plot);
     var spec = Generate.genSpec(plot, config);
     // console.log(JSON.stringify(spec, null, 4));
@@ -75,14 +85,7 @@ function makeChart(input: string) {
       }).update();
       setSize();
     });
-  } catch (e) {
-    if (typeof e['code'] === 'undefined') {
-      $error.text(e);
-    } else {
-      var err: Parse.Error = e;
-      $error.text('[' + ['spec'].concat(err.path).join('.') + '] ' + err.message);
-    }
-  }
+  });
 }
 
 codeMirror.on('change', editor => {

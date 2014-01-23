@@ -47,7 +47,7 @@ interface Layer {
 
 interface Plot {
   layers: Layer[];
-  data: any[];
+  data: Vega.Data[];
   mapping: Mapping;
   scales: Scales;
 }
