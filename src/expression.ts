@@ -1,41 +1,48 @@
 /// <reference path="declarations"/>
 
-export enum Type {
-  constant,
-  variable
+export interface Match {
+  <T>(cases: Cases<T>): T;
 }
 
 export interface Expr {
-  type: Type;
-  vals: any[]; // the values this expression can take (one element in the case of constants)
+  match: Match;
+  evaluate: (data: RtDatum[]) => any[];
 }
 
-export interface Const extends Expr {}
-
-export interface Var extends Expr {
-  data: string; // data source name
-  path: string[]; // the paths within the data object
+export interface Const {
+  val: any;
 }
 
-export function match<T>(expr: Expr, ifConst: (c: Const) => T, ifVar: (v: Var) => T): T {
-  if (expr.type === Type.constant)
-    return ifConst(expr);
+export interface Var {
+  field: string;
+}
+
+export interface Cases<T> {
+  ifConst: (c: Const) => T;
+  ifVar: (v: Var) => T;
+}
+
+function enhance(match: Match): Expr {
+  return {
+    match: match,
+    evaluate: data => match({
+      ifConst: (c:Const) => [c.val],
+      ifVar: (v:Var) => {
+        var path = v.field.split('.');
+        return data.map(d => {
+          path.forEach(segment => {
+            d = d[segment];
+          });
+          return d;
+        });
+      }
+    })
+  };
+}
+
+export function parse(input: any): Expr {
+  if (typeof input !== 'string' || input.indexOf('$') !== 0)
+    return enhance(cases => cases.ifConst({val: input}));
   else
-    return ifVar(<Var>expr);
-}
-
-export function parse(dataSet: RtDatum[], input: any): Expr {
-  if (typeof input !== 'string' || input.indexOf('$') !== 0) {
-    return {
-      type: Type.constant,
-      vals: [input]
-    };
-  } else {
-    var s = (<string>input).substring(1);
-    var firstDot = s.indexOf('.');
-    if (firstDot < 0)
-      throw 'Invalidly formatted data accessor: ' + input + ' (should have the form $<dataset>.<path.to.values>)';
-    var dataName = s.substring(0, firstDot);
-    var path = s.substring(firstDot+1).split('.');
-  }
+    return enhance(cases => cases.ifVar({field: [/*'data',*/ (<string>input).substring(1)].join('.')}));
 }

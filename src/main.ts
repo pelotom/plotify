@@ -64,46 +64,35 @@ $win.resize(setSize);
 function makeChart(input: string) {
   var plot: Plot;
   try {
-    plot = Parse.parse(JsYaml.safeLoad(input), config);
+    var json = JsYaml.safeLoad(input);
+    // console.log('json input', JSON.stringify(json, null, 4));
+    plot = Parse.parse(json, config);
   } catch (e) {
     var err: Parse.Error = e;
     $error.text('[' + ['spec'].concat(err.path).join('.') + '] ' + err.message);
   }
-  var result = vg.parse.spec({data: plot.dataSets, marks: []}, chart => {
-    plot.rtDataSets = chart({el:$chart[0]})['_model']['_data'];
-    // cache the values so we don't have to re-download unless the data changes
-    plot.dataSets.forEach(set => {
-      set.values = processed[set.name].map(d => d['data']);
-    });
-    plot = Infer.infer(plot);
-    var spec = Generate.genSpec(plot, config);
-    // console.log(JSON.stringify(spec, null, 4));
-    vg.parse.spec(spec, chart => {
-      $error.text('');
-      view = chart({
-        el: $chart[0],
-        renderer: 'svg'
-      }).update();
-      setSize();
-    });
+  var result = vg.parse.spec({data: plot.data, marks: []}, chart => {
+    try {
+      plot.rtDataSets = chart({el:$chart[0]})['_model']['_data'];
+      plot.data.forEach(set => {
+        if (set.url)
+          set.values = plot.rtDataSets[set.name].map(d => d['data']);
+      });
+      Infer.infer(plot);
+      var spec = Generate.genSpec(plot, config);
+      // console.log('generated', JSON.stringify(spec, null, 4));
+      vg.parse.spec(spec, chart => {
+        $error.text('');
+        view = chart({
+          el: $chart[0],
+          renderer: 'svg'
+        }).update();
+        setSize();
+      });
+    } catch (e) {
+      $error.text(e);
+    }
   });
-  // var dataParse = window['dataParse'] = vg.parse.data(plot.data, () => {
-  //   plot.data = _.pairs(dataParse.load).map(keyValue => {
-  //     return {name: keyValue[0], values: keyValue[1]};  
-  //   });
-  //   console.log(JSON.stringify(plot.data, null, 4));
-  //   plot = Infer.infer(plot);
-  //   var spec = Generate.genSpec(plot, config);
-  //   // console.log(JSON.stringify(spec, null, 4));
-  //   vg.parse.spec(spec, chart => {
-  //     $error.text('');
-  //     view = chart({
-  //       el: $chart[0],
-  //       renderer: 'svg'
-  //     }).update();
-  //     setSize();
-  //   });
-  // });
 }
 
 codeMirror.on('change', editor => {

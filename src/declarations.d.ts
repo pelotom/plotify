@@ -42,6 +42,7 @@ interface Scales extends AesMap<Scale> {}
 
 interface Layer {
   type: string;
+  from?: Vega.Mark.From;
   mapping: Mapping;
 }
 
@@ -54,7 +55,7 @@ interface RtDataSets {
 }
 
 interface Plot {
-  dataSets: Vega.Data[];
+  data: Vega.Data[];
   rtDataSets?: RtDataSets;
   layers: Layer[];
   mapping: Mapping;
@@ -69,6 +70,7 @@ interface Config {
 
 declare module Geometry {
   export interface GenerateArgs {
+    data: RtDatum[];
     mapping: Mapping;
     isCategorical: (attribute: string) => boolean;
   }

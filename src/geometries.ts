@@ -6,7 +6,6 @@ import U = require('./util');
 export function mkMark(type: string, set: Vega.Mark.PropertySet) {
   return {
     type: type,
-    from: { data: U.DATA_NAME },
     properties: { update: set }
   };
 }
@@ -49,6 +48,7 @@ _.each(vegaTypes, type => {
   defaults[type] = {
     aesthetics: U.basicAesthetics,
     generate: args => {
+      var data = args.data;
       var mapping = args.mapping;
       var set: Vega.Mark.PropertySet = {};
       _.each(U.basicAesthetics, aes => {
@@ -77,6 +77,7 @@ defaults['line'].generate = args => {
 defaults['bar'] = {
   aesthetics: U.basicAesthetics,
   generate: args => {
+    var data = args.data;
     var mapping = args.mapping;
     var isCat = args.isCategorical;
     var set: Vega.Mark.PropertySet = _.extend({}, defaults['rect'].generate(args).properties.update);

@@ -49,12 +49,7 @@ export function genSpec(plot: Plot, config: Config): Vega.Spec {
   var scales = _.flatten(_.keys(plot.scales).map(scaleName => genScales(plot, scaleName)));
 
   return {
-    data: [
-      {
-        name: U.DATA_NAME,
-        values: plot.data
-      }
-    ],
+    data: plot.data,
     scales: scales,
     axes: genAxes(scales),
     // legends: [
@@ -67,6 +62,7 @@ export function genSpec(plot: Plot, config: Config): Vega.Spec {
     // ],
     marks: plot.layers.map(layer => {
       var args: Geometry.GenerateArgs = {
+        data: plot.rtDataSets[layer.from.data],
         mapping: _.extend({}, plot.mapping, layer.mapping),
         isCategorical: attr => {
           var scale = _.find(scales, scale => {
@@ -75,7 +71,9 @@ export function genSpec(plot: Plot, config: Config): Vega.Spec {
           return scale && scale.type === 'ordinal';
         }
       };
-      return config.geometries[layer.type].generate(args);
+      var mark: Vega.Mark = config.geometries[layer.type].generate(args);
+      mark.from = layer.from;
+      return mark;
     })
   };
 }

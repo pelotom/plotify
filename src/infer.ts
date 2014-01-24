@@ -3,20 +3,19 @@
 import _ = require('underscore');
 import d3 = require('d3');
 import U = require('./util');
+import E = require('./expression');
 
 function inferScale(plot: Plot, scaleName: string): Scale {
-  var mappings = [plot.mapping].concat(plot.layers.map(layer => layer.mapping));
-  var vals = _.unique(_.flatten(mappings.map(m => {
+  var mappingPairs = plot.layers.map(layer => {
+    var layerMapping: Mapping = _.extend({}, plot.mapping, layer.mapping);
+    return {fromData: layer.from.data, mapping: layerMapping};
+  });
+  // var mappings = [plot.mapping].concat(plot.layers.map(layer => layer.mapping));
+  var vals = _.unique(_.flatten(mappingPairs.map(mp => {
+    var m = mp.mapping;
     return _.keys(m).map(aes => {
-      if (U.scaleFor(aes) === scaleName) {
-        var mapsTo = m[aes];
-        if (typeof mapsTo === 'string' && mapsTo.indexOf('$') === 0)
-          // variable
-          return plot.data.map(data => data.values.map(d => d[mapsTo.substring(1)]));
-        else
-          // constant
-          return [mapsTo];
-      }
+      if (U.scaleFor(aes) === scaleName)
+        return E.parse(m[aes]).evaluate(plot.rtDataSets[mp.fromData]);
       return []; 
     });
   })));
@@ -36,28 +35,31 @@ function inferScale(plot: Plot, scaleName: string): Scale {
   return scale;
 }
 
-function inferScales(plot: Plot): Scales {
+function inferScales(plot: Plot) {
   var pairs = <any[]>U.scaleNames.map(scaleName => {
     var inferred = inferScale(plot, scaleName);
-    // TODO use user-specified scale fields if provided, check for inconsistencies
     return [scaleName, inferred];
   });
-  var result: Scales = {};
+  // TODO use user-specified scale fields if provided, check for inconsistencies
   _.each(pairs, p => {
-    if (!!p[1]) result[p[0]] = p[1];
+    if (!!p[1]) plot.scales[p[0]] = p[1];
   });
-  return result;
 }
 
-function inferLayers(plot: Plot): Layer[] {
-  return plot.layers;
+function inferLayers(plot: Plot) {
+  var dataKeys = _.keys(plot.rtDataSets);
+  plot.layers.forEach(layer => {
+    if (!layer.from) {
+      if (dataKeys.length === 1) {
+        layer.from = {
+          data: dataKeys[0]
+        };
+      } else throw "Layer's data source is ambiguous; provide a 'from' declaration";
+    }
+  });
 }
 
-export function infer(plot: Plot): Plot {
-  return {
-    data: plot.data,
-    mapping: plot.mapping,
-    scales: inferScales(plot),
-    layers: inferLayers(plot)
-  }
+export function infer(plot: Plot) {
+  inferLayers(plot);
+  inferScales(plot);
 }

@@ -1,9 +1,25 @@
 data:
 - name: table
   url: examples/testdata.json
+- name: derived
+  source: table
+  transform:
+  - type: formula
+    field: center
+    expr: '(20 + d.data.y)/2 - 2.8'
 mapping:
-  x: $x
-  y: $y
+  y: $data.x
   fill: steelblue
 layers:
 - type: bar
+  from: table
+  mapping:
+    x: $data.y
+    x2: 20
+- type: text
+  from: derived
+  mapping:
+    fill: black
+    x: $center
+    dy: 5
+    fontSize: 20

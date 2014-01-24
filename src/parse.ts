@@ -164,21 +164,25 @@ function parseScales(aesthetics: string[]): Parser<Scales> {
   return parseAesMap(aesthetics, parseScale);
 }
 
-function parseLayer(geomTypes: string[], aesthetics: string[]): Parser<Layer> {
+function parseLayer(geomTypes: string[], aesthetics: string[], dataNames: string[]): Parser<Layer> {
   return parser(input => {
     var layer: Layer = {
       type: parseProp('type', false, parseOneOf(geomTypes))(input),
       mapping: parseProp('mapping', true, parseMapping(aesthetics))(input) || {}
     };
+    var from = parseProp('from', true, parseOneOf(dataNames))(input);
+    if (from)
+      layer.from = { data: from };
     return checkExtra(input, layer);
   });
 }
 
 function parsePlot(geomTypes: string[], aesthetics: string[]): Parser<Plot> {
   return parser(input => {
+    var data = parseProp('data', true, parseDataSet)(input) || [];
     var plot: Plot = {
-      layers: parseProp('layers', false, parseArray(parseLayer(geomTypes, aesthetics)))(input),
-      data: parseProp('data', true, parseDataSet)(input) || [],
+      layers: parseProp('layers', false, parseArray(parseLayer(geomTypes, aesthetics, data.map(set => set.name))))(input),
+      data: data,
       mapping: parseProp('mapping', true, parseMapping(aesthetics))(input) || {},
       scales: {}//parseProp('scales', true, parseScales)(input) || {}
     };
