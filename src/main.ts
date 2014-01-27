@@ -18,6 +18,7 @@ var config: Config = {
 
 var $win = $(window);
 var $chart = $('#chart');
+var $dummy = $('#dummy-chart');
 var $error = $('#error');
 var view: Vega.View;
 
@@ -73,7 +74,7 @@ function makeChart(input: string) {
   }
   var result = vg.parse.spec({data: plot.data, marks: []}, chart => {
     try {
-      plot.rtDataSets = chart({el:$chart[0]})['_model']['_data'];
+      plot.rtDataSets = chart({el:$dummy[0]})['_model']['_data'];
       plot.data.forEach(set => {
         if (set.url)
           set.values = plot.rtDataSets[set.name].map(d => d['data']);
