@@ -44,5 +44,5 @@ export function parse(input: any): Expr {
   if (typeof input !== 'string' || input.indexOf('$') !== 0)
     return enhance(cases => cases.ifConst({val: input}));
   else
-    return enhance(cases => cases.ifVar({field: [/*'data',*/ (<string>input).substring(1)].join('.')}));
+    return enhance(cases => cases.ifVar({field: ['data', (<string>input).substring(1)].join('.')}));
 }
