@@ -71,6 +71,7 @@ function makeChart(input: string) {
   } catch (e) {
     var err: Parse.Error = e;
     $error.text('[' + ['spec'].concat(err.path).join('.') + '] ' + err.message);
+    return;
   }
   var result = vg.parse.spec({data: plot.data, marks: []}, chart => {
     try {
