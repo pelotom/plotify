@@ -6,11 +6,12 @@ mapping:
   fill: steelblue
 layers:
 - type: bar
-  from: table
+  data: table
   mapping:
     x: $y
     x2: 20
 - type: text
+  data: table
   mapping:
     fill: black
     x: $y

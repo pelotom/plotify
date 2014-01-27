@@ -83,10 +83,13 @@ function parseOneOf<T>(possibilities: T[]): Parser<T> {
   });
 }
 
-function checkExtra<T>(input: Input, result: T): T {
-  for (var prop in input.val)
+function checkExtra<T>(input: Input, result: T, rename?: any): T {
+  for (var prop in input.val) {
+    if (rename && prop in rename)
+      prop = rename[prop];
     if (!(prop in result))
       throw new Error(ERR_EXTRA_PROP, input.path, 'unrecognized property: ' + prop);
+  }
   return result;
 }
 
@@ -170,10 +173,10 @@ function parseLayer(geomTypes: string[], aesthetics: string[], dataNames: string
       type: parseProp('type', false, parseOneOf(geomTypes))(input),
       mapping: parseProp('mapping', true, parseMapping(aesthetics))(input) || {}
     };
-    var from = parseProp('from', true, parseOneOf(dataNames))(input);
-    if (from)
-      layer.from = { data: from };
-    return checkExtra(input, layer);
+    var data = parseProp('data', true, parseOneOf(dataNames))(input);
+    if (data)
+      layer.from = { data: data };
+    return checkExtra(input, layer, {data: 'from'});
   });
 }
 
