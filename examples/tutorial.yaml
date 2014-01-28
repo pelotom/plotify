@@ -1,19 +1,18 @@
 data:
 - name: table
-  url: examples/testdata.json
+  values:
+  - {x: A, y: 28}
+  - {x: B, y: 55}
+  - {x: C, y: 43}
+  - {x: D, y: 91}
+  - {x: E, y: 81}
+  - {x: F, y: 53}
+  - {x: G, y: 19}
+  - {x: H, y: 87}
+  - {x: I, y: 52}
 mapping:
-  y: $x
+  x: $x
+  y: $y
   fill: steelblue
 layers:
 - type: bar
-  data: table
-  mapping:
-    x: $y
-    x2: 20
-- type: text
-  data: table
-  mapping:
-    fill: black
-    x: $y
-    dy: 5
-    fontSize: 20
