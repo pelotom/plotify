@@ -87,7 +87,7 @@ function makeChart(input: string) {
         $error.text('');
         view = chart({
           el: $chart[0],
-          renderer: 'svg'
+          renderer: 'canvas'
         }).update();
         setSize();
       });
