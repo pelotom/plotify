@@ -140,7 +140,7 @@ var parseDataTransform: Parser<Vega.Data.Transform> = parser(input => {
 
 var parseData: Parser<Vega.Data> = parser(input => {
   return {
-    name: parseProp('name', false, parseAtom('string'))(input),
+    name: parseProp('name', true, parseAtom('string'))(input) || 'default',
     format: parseProp('format', true, parseDataFormat)(input),
     values: parseProp('values', true, parseAtom())(input),
     source: parseProp('source', true, parseAtom('string'))(input),
