@@ -101,7 +101,7 @@ codeMirror.on('change', editor => {
   makeChart(editor.getDoc().getValue());
 });
 
-$.ajax('examples/tutorial.yaml', {dataType:'text'}).done(input => {
+$.ajax('examples/specs/tutorial.yaml', {dataType:'text'}).done(input => {
   codeMirror.getDoc().setValue(input);
   makeChart(input);
 });

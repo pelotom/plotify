@@ -1,6 +1,5 @@
 data:
-- name: table
-  values:
+- values:
   - {x: A, y: 28}
   - {x: B, y: 55}
   - {x: C, y: 43}
@@ -14,5 +13,6 @@ mapping:
   x: $x
   y: $y
   fill: steelblue
+  stroke: white
 layers:
 - type: bar
