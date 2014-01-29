@@ -25,7 +25,13 @@ var view: Vega.View;
 
 var codeMirror = CodeMirror.fromTextArea(<HTMLTextAreaElement>$('#input')[0], {
   mode:  'yaml',
-  theme: 'base16-light',
+  theme: (() => {
+    // get the theme that was loaded in the html
+    var href = $('#cm-theme-link').attr('href');
+    var theme = href.substring(href.lastIndexOf('/') + 1, href.lastIndexOf('.'));
+    return theme;
+  })(),
+  // lineNumbers: true,
   indentUnit: 2,
   smartIndent: true,
   indentWithTabs: false,
