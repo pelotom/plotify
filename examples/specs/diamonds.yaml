@@ -15,7 +15,10 @@ data:
 mapping:
   x: $carat
   y: $price
+  shape: diamond
   size: 20
   opacity: 0.3
+  fill: none
+  stroke: black
 layers:
 - type: point
