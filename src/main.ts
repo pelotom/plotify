@@ -140,7 +140,7 @@ function makeChart(input: string): JQueryDeferred<void> {
   });
 })();
 
-$.ajax('examples/specs/iris.yaml', {dataType:'text'}).done(input => {
+$.ajax('examples/specs/diamonds.yaml', {dataType:'text'}).done(input => {
   codeMirror.getDoc().setValue(input);
   makeChart(input);
 });

@@ -1,5 +1,5 @@
 data:
-- url: examples/data/diamonds.csv
+- url: examples/data/dsmall.csv
   format:
     type: csv
     parse:
@@ -13,8 +13,7 @@ data:
 mapping:
   x: $carat
   y: $price
-  fill: black
-  opacity: 0.3
   size: 20
+  opacity: 0.3
 layers:
 - type: point
