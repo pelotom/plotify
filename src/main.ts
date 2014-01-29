@@ -11,6 +11,7 @@ import Geoms = require('./geometries');
 import Parse = require('./parse');
 import Infer = require('./infer');
 import Generate = require('./generate');
+import Zoom = require('./zoom');
 
 var config: Config = {
   geometries: Geoms.defaults
@@ -93,13 +94,7 @@ var codeMirror = CodeMirror.fromTextArea(<HTMLTextAreaElement>$('#input')[0], {
   });
 })();
 
-// Listen for the user resizing the window
-$win.resize(setSize);
-
-// Initialize the layout
-setSize();
-
-function setSize() {
+export function redraw() {
   var ratio = 1/3;
   var w = $win.width();
   var h = $win.height() - 60;
@@ -108,19 +103,40 @@ function setSize() {
   if (view) {
     var pad = view.padding();
     var viewWidth = (1-ratio) * w - pad.left - pad.right - 20;
-    var viewHeight = h - pad.top - pad.bottom + 7;
+    var viewHeight = h - pad.top - pad.bottom;
 
-    var scales = _.object((<Vega.Scale[]>view['_model']['_defs']['marks']['scales']).map(s => [s.name, s.name]));
-    view
-      .width(viewWidth)
-      .height(viewHeight)
-      .update();
+    // Rewrite some aspects of the scale definitions so that updating the
+    // view doesn't reset to the initial domain
+    var currentScales = view['model']().scene().items[0].scales;
+    view['defs']().marks.scales.forEach((scale: Vega.Scale) => {
+      scale.nice = false;
+      scale.zero = false;
+      scale.domain = currentScales[scale.name].domain();
+    });
 
     $chart.css({
       'margin-left': ratio*w + 5
     });
+
+    view
+      .width(viewWidth)
+      .height(viewHeight)
+      .update()
+      ;
   }
 }
+
+function setSize() {
+  redraw();
+  if (view)
+    Zoom.configZoom(view);
+}
+
+// Listen for the user resizing the window
+$win.resize(setSize);
+
+// Initialize the layout
+setSize();
 
 function makeChart(input: string): JQueryDeferred<void> {
   var deferred = $.Deferred();
@@ -150,6 +166,7 @@ function makeChart(input: string): JQueryDeferred<void> {
             el: $chart[0],
             renderer: 'canvas'
           }).update();
+          view.padding().left += 20;
           setSize();
         });
       } catch (e) {

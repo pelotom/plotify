@@ -5,7 +5,7 @@ import d3 = require('d3');
 import U = require('./util');
 import E = require('./expression');
 
-function inferScale(plot: Plot, scaleName: string): Scale {
+export function inferScale(plot: Plot, scaleName: string): Scale {
   var mappingPairs = plot.layers.map(layer => {
     var layerMapping: Mapping = _.extend({}, plot.mapping, layer.mapping);
     return {fromData: layer.from.data, mapping: layerMapping};
@@ -46,7 +46,7 @@ function inferScales(plot: Plot) {
   });
 }
 
-function inferLayers(plot: Plot) {
+export function inferLayers(plot: Plot) {
   var dataKeys = _.keys(plot.rtDataSets);
   plot.layers.forEach(layer => {
     if (!layer.from) {
