@@ -39,12 +39,12 @@ var codeMirror = CodeMirror.fromTextArea(<HTMLTextAreaElement>$('#input')[0], {
 });
 
 function setSize() {
-  if (view) {
-    var ratio = 1/3;
-    var w = $win.width();
-    var h = $win.height() - 40;
-    codeMirror.setSize(ratio*w, h);
+  var ratio = 1/3;
+  var w = $win.width();
+  var h = $win.height() - 40;
+  codeMirror.setSize(ratio*w, h);
 
+  if (view) {
     var pad = view.padding();
     var viewWidth = (1-ratio) * w - pad.left - pad.right - 20;
     var viewHeight = h - pad.top - pad.bottom + 10;
@@ -60,6 +60,8 @@ function setSize() {
     });
   }
 }
+
+setSize();
 
 $win.resize(setSize);
 
