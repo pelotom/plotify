@@ -43,7 +43,18 @@ function genAxes(scales: Vega.Scale[]) {
       return false;
     }
   }).map(s => {
-    return {type: s.name, scale: s.name, grid: s.type !== 'ordinal'};
+    var axis: Vega.Axis = {
+      type: s.name,
+      scale: s.name,
+      grid: s.type !== 'ordinal',
+      properties: {
+        grid: {
+          stroke: { value: 'black' },
+          strokeOpacity: { value: 0.1 }
+        }
+      }
+    };
+    return axis;
   });
 }
 
