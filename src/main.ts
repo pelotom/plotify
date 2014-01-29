@@ -72,26 +72,31 @@ function makeChart(input: string): JQueryDeferred<void> {
     plot = Parse.parse(json, config);
 
     function innerParse() {
-      Infer.infer(plot);
-      var spec = Generate.genSpec(plot, config);
-      spec.data.forEach(set => {
-        if (set.url) {
-          delete set.url;
-          delete set.format;
-          set.values = plot.rtDataSets[set.name].map(d => d['data']);
-        }
-      });
-      vg.parse.spec(spec, chart => {
-        if (deferred.state() === 'rejected')
-          return;
-        deferred.resolve();
-        $error.text('');
-        view = chart({
-          el: $chart[0],
-          renderer: 'canvas'
-        }).update();
-        setSize();
-      });
+      try {
+        Infer.infer(plot);
+        var spec = Generate.genSpec(plot, config);
+        spec.data.forEach(set => {
+          if (set.url) {
+            delete set.url;
+            delete set.format;
+            set.values = plot.rtDataSets[set.name].map(d => d['data']);
+          }
+        });
+        vg.parse.spec(spec, chart => {
+          if (deferred.state() === 'rejected')
+            return;
+          deferred.resolve();
+          $error.text('');
+          view = chart({
+            el: $chart[0],
+            renderer: 'canvas'
+          }).update();
+          setSize();
+        });
+      } catch (e) {
+        $error.text(e);
+        deferred.fail();
+      }
     }
 
     if (oldPlot && _.isEqual(oldPlot.data, plot.data)) {
@@ -101,13 +106,8 @@ function makeChart(input: string): JQueryDeferred<void> {
       vg.parse.spec({data: plot.data, marks: []}, chart => {
         if (deferred.state() === 'rejected')
           return;
-        try {
           plot.rtDataSets = chart({el:$dummy[0]})['_model']['_data'];
           innerParse();
-        } catch (e) {
-          $error.text(e);
-          deferred.fail();
-        }
       });
     }
   } catch (e) {
