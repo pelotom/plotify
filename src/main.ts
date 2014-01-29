@@ -11,6 +11,7 @@ import Geoms = require('./geometries');
 import Parse = require('./parse');
 import Infer = require('./infer');
 import Generate = require('./generate');
+import Zoom = require('./zoom');
 
 var config: Config = {
   geometries: Geoms.defaults
@@ -108,7 +109,7 @@ function setSize() {
   if (view) {
     var pad = view.padding();
     var viewWidth = (1-ratio) * w - pad.left - pad.right - 20;
-    var viewHeight = h - pad.top - pad.bottom + 7;
+    var viewHeight = h - pad.top - pad.bottom;
 
     var scales = _.object((<Vega.Scale[]>view['_model']['_defs']['marks']['scales']).map(s => [s.name, s.name]));
     view
@@ -151,6 +152,7 @@ function makeChart(input: string): JQueryDeferred<void> {
             renderer: 'canvas'
           }).update();
           setSize();
+          Zoom.configZoom(view, plot);
         });
       } catch (e) {
         $error.text(e);
