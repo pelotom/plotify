@@ -166,6 +166,7 @@ function makeChart(input: string): JQueryDeferred<void> {
             el: $chart[0],
             renderer: 'canvas'
           }).update();
+          view.padding().left += 20;
           setSize();
         });
       } catch (e) {
