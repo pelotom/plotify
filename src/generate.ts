@@ -19,6 +19,8 @@ function genScales(plot: Plot, scaleName: string): Vega.Scale[] {
   if ('nice' in scale)
     vegaScale.nice = scale.nice;
 
+  vegaScale.zero = false;
+
   var results = [vegaScale];
   if ((scaleName === 'x' || scaleName === 'y') && type === 'ordinal') {
     results.push(_.extend({}, vegaScale, {
