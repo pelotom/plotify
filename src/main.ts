@@ -108,7 +108,7 @@ function setSize() {
   if (view) {
     var pad = view.padding();
     var viewWidth = (1-ratio) * w - pad.left - pad.right - 20;
-    var viewHeight = h - pad.top - pad.bottom + 10;
+    var viewHeight = h - pad.top - pad.bottom + 7;
 
     var scales = _.object((<Vega.Scale[]>view['_model']['_defs']['marks']['scales']).map(s => [s.name, s.name]));
     view
