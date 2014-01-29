@@ -1,7 +1,8 @@
 export enum Name {
   x,
   y,
-  fill,
-  stroke,
-  shape
+  color,
+  shape,
+  size,
+  opacity
 }

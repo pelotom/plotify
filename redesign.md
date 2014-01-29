@@ -38,5 +38,5 @@ Initial chart creation
     - if all of the extents are date ranges, the scale is time (or UTC if overridden)
     - otherwise the scale is linear (or log, etc. if overridden)
   - the domain is (the convex hull of) the union of the extents given by each of the geoms for that dimension
-  - the range is taken from defaults, can be overridden by spec
+  - the range is taken from a static set of defaults, can be overridden by spec
     - x and y need access to width and height of the container

@@ -1,8 +1,9 @@
 import Aes = require('./aes');
 import Scale = require('./scale');
 
-interface ExtentArgs {
-  scaleType(aes: Aes.Name): Scale.Type;
+interface Geom {
+  extents: Extent[];
+  render();
 }
 
 interface Extent {
@@ -11,6 +12,25 @@ interface Extent {
   values: any[];
 }
 
-interface Geom {
-  extents(args: ExtentArgs): Extent[];
+interface Factory {
+  (args: Factory.Args): Geom;
 }
+
+module Factory {
+  export interface Args {
+    scaleType(aes: Aes.Name): Scale.Type;
+  }
+}
+
+var bar: Factory = (args) => ({
+  extents: [
+    {
+      aes: Aes.Name.x,
+      type: Scale.Type.numeric,
+      values: []
+    }
+  ],
+  render: () => {
+    console.log('hello world');
+  }
+});
