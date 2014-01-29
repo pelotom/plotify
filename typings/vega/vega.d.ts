@@ -9,12 +9,14 @@ declare module Vega {
   }
 
   export interface Parse {
-    spec(url: string, callback: (chart: (args: ViewArgs) => View) => void);
-    spec(spec: Spec, callback: (chart: (args: ViewArgs) => View) => void);
-    data(dataSet: Vega.Data[], callback: () => void);
+    spec(url: string, callback: (chart: (args: ViewArgs) => View) => void): void;
+    spec(spec: Spec, callback: (chart: (args: ViewArgs) => View) => void): void;
+    data(dataSet: Vega.Data[], callback: () => void): void;
+    // TODO all the other stuff
   }
 
   export interface ViewArgs {
+    // TODO docs
     el: any;
     data?: any;
     hover?: boolean;
@@ -22,6 +24,7 @@ declare module Vega {
   }
 
   export interface View {
+    // TODO docs
     width(): number;
     width(w: number): View;
 
@@ -47,6 +50,7 @@ declare module Vega {
   }
 
   export interface Padding {
+    // TODO docs
     top: number;
     right: number;
     bottom: number;
@@ -54,6 +58,7 @@ declare module Vega {
   }
 
   export interface UpdateOptions {
+    // TODO docs
     props?: string;
     items?: any;
     duration?: number;
@@ -199,7 +204,36 @@ declare module Vega {
   }
 
   export interface Axis {
-    // TODO
+    // TODO docs
+    type: string;
+    scale: string;
+    orient?: string;
+    title?: string;
+    titleOffset?: number;
+    format?: string;
+    ticks?: number;
+    values?: any[];
+    subdivide?: number;
+    tickPadding?: number;
+    tickSize?: number;
+    tickSizeMajor?: number;
+    tickSizeMinor?: number;
+    tickSizeEnd?: number;
+    offset?: any;
+    layer?: string;
+    grid?: boolean;
+    properties?: Axis.Properties
+  }
+
+  export module Axis {
+    export interface Properties {
+      majorTicks?: Mark.PropertySet;
+      minorTicks?: Mark.PropertySet;
+      grid?: Mark.PropertySet;
+      labels?: Mark.PropertySet;
+      title?: Mark.PropertySet;
+      axis?: Mark.PropertySet;
+    }
   }
 
   export interface Legend {
@@ -212,7 +246,7 @@ declare module Vega {
     name?: string;
     description?: string;
     from?: Mark.From;
-    properties: Mark.PropertySets;
+    properties?: Mark.PropertySets;
     key?: string;
     delay?: Mark.ValueRef;
   }
