@@ -19,6 +19,8 @@ export function configZoom(view: Vega.View) {
       zoom.on('zoom', Main.redraw);
     })
     ;
+
+  // Make an overlay fitted to the coordinate space of the chart to capture zoom gestures
   var padding = view.padding();
   overlay.style(<any>{
     top: padding.top + 'px',
@@ -27,10 +29,10 @@ export function configZoom(view: Vega.View) {
     left: padding.left + 'px'
   });
 
-  zoom['size']([view.width(), view.height()]);
-
   ['x', 'y'].forEach(scaleName => {
-    zoom[scaleName](view['model']().scene().items[0].scales[scaleName]);
+    var scale = view['model']().scene().items[0].scales[scaleName];
+    if (scale.type !== 'ordinal') // Only allow zooming continuous scales
+      zoom[scaleName](scale);
   });
 
   zoom(overlay);
