@@ -1,17 +1,19 @@
+# A simple bar chart
+
 data:
 - values:
-  - {x: A, y: 28}
-  - {x: B, y: 55}
-  - {x: C, y: 43}
-  - {x: D, y: 91}
-  - {x: E, y: 81}
-  - {x: F, y: 53}
-  - {x: G, y: 19}
-  - {x: H, y: 87}
-  - {x: I, y: 52}
+  - {letter: A, number: 28}
+  - {letter: B, number: 55}
+  - {letter: C, number: 43}
+  - {letter: D, number: 91}
+  - {letter: E, number: 81}
+  - {letter: F, number: 53}
+  - {letter: G, number: 19}
+  - {letter: H, number: 87}
+  - {letter: I, number: 52}
 mapping:
-  x: $x
-  y: $y
+  x: $letter
+  y: $number
   fill: steelblue
 layers:
 - type: bar

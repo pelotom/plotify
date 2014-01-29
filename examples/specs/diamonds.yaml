@@ -1,3 +1,5 @@
+# A 5000-sample diamond data set
+
 data:
 - url: examples/data/dsmall.csv
   format:

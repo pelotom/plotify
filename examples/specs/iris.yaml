@@ -1,3 +1,5 @@
+# Fisher's Iris flower data set
+
 data:
 - url: examples/data/iris.json
 mapping:
