@@ -54,7 +54,7 @@ function inferLayers(plot: Plot) {
         layer.from = {
           data: dataKeys[0]
         };
-      } else throw "Layer's data source is ambiguous; provide a 'from' declaration";
+      } else throw "Layer's data source is ambiguous; provide a 'data' declaration within the layer";
     }
   });
 }
