@@ -1,9 +1,18 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600' rel='stylesheet' type='text/css'>
     <link href="../bower_components/codemirror/lib/codemirror.css" rel="stylesheet"></link>
     <link id='cm-theme-link' href="../bower_components/codemirror/theme/lesser-dark.css" rel="stylesheet"></link>
+
     <style>
+    body {
+      font-family: Source Sans Pro;
+    }
+    #example-chooser-container {
+      position: relative;
+      top: -2px;
+    }
     #input {
       display: none;
     }
@@ -26,6 +35,11 @@
   </head>
 
   <body>
+    <div id='example-chooser-container'>
+      Choose an example to get you started:
+      <select id='example-chooser'></select>
+    </div>
+
     <textarea id='input'></textarea>
 
     <div id='chart'></div>

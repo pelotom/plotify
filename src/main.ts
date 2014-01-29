@@ -17,12 +17,39 @@ var config: Config = {
 };
 
 var $win = $(window);
+var $chooser = $('#example-chooser');
 var $chart = $('#chart');
 var $dummy = $('#dummy-chart');
 var $error = $('#error');
 var plot: Plot;
 var view: Vega.View;
 
+// Load the examples
+$.get('examples/specs/').then(html => {
+  var $links = $.makeArray($(html).find('tr a'));
+  $links.shift(); // remove '..'
+  return $links.map(elem => elem.textContent);
+}).done((examples: string[]) => {
+  examples.forEach(e => {
+    $('<option>')
+      .attr('value', e)
+      .text(e.substring(0, e.lastIndexOf('.')))
+      .appendTo($chooser);
+  });
+
+  function setExample() {
+    $.ajax('examples/specs/' + $chooser.val(), {dataType:'text'}).done(input => {
+      codeMirror.getDoc().setValue(input);
+      makeChart(input);
+    });
+  }
+
+  $chooser.change(setExample);
+
+  setExample();
+});
+
+// Set up the input editor
 var codeMirror = CodeMirror.fromTextArea(<HTMLTextAreaElement>$('#input')[0], {
   mode:  'yaml',
   theme: (() => {
@@ -44,10 +71,38 @@ var codeMirror = CodeMirror.fromTextArea(<HTMLTextAreaElement>$('#input')[0], {
   }
 });
 
+// Listen for changes to the input
+(function () {
+  var tid: number;
+  var dfd: JQueryDeferred<void>;
+  codeMirror.on('change', editor => {
+    if (tid) {
+      clearTimeout(tid);
+      tid = null;
+    }
+    if (dfd) {
+      dfd.reject();
+      dfd = null;
+    }
+    tid = setTimeout(() => {
+      dfd = makeChart(editor.getDoc().getValue()).always(() => {
+        tid = null;
+        dfd = null;
+      });
+    }, 500);
+  });
+})();
+
+// Listen for the user resizing the window
+$win.resize(setSize);
+
+// Initialize the layout
+setSize();
+
 function setSize() {
   var ratio = 1/3;
   var w = $win.width();
-  var h = $win.height() - 40;
+  var h = $win.height() - 60;
   codeMirror.setSize(ratio*w, h);
 
   if (view) {
@@ -66,10 +121,6 @@ function setSize() {
     });
   }
 }
-
-setSize();
-
-$win.resize(setSize);
 
 function makeChart(input: string): JQueryDeferred<void> {
   var deferred = $.Deferred();
@@ -126,31 +177,3 @@ function makeChart(input: string): JQueryDeferred<void> {
 
   return deferred;
 }
-
-(function () {
-  var tid: number;
-  var dfd: JQueryDeferred<void>;
-  codeMirror.on('change', editor => {
-    if (tid) {
-      clearTimeout(tid);
-      tid = null;
-    }
-    if (dfd) {
-      dfd.reject();
-      dfd = null;
-    }
-    tid = setTimeout(() => {
-      dfd = makeChart(editor.getDoc().getValue()).always(() => {
-        tid = null;
-        dfd = null;
-      });
-    }, 500);
-  });
-})();
-
-$.ajax('examples/specs/diamonds.yaml', {dataType:'text'}).done(input => {
-  codeMirror.getDoc().setValue(input);
-  makeChart(input);
-});
-
-
