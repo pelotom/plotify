@@ -13,6 +13,5 @@ mapping:
   x: $x
   y: $y
   fill: steelblue
-  stroke: white
 layers:
 - type: bar
