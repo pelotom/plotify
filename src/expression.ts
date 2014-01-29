@@ -43,6 +43,12 @@ function enhance(match: Match): Expr {
 export function parse(input: any): Expr {
   if (typeof input !== 'string' || input.indexOf('$') !== 0)
     return enhance(cases => cases.ifConst({val: input}));
-  else
-    return enhance(cases => cases.ifVar({field: ['data', (<string>input).substring(1)].join('.')}));
+  else {
+    var val: Vega.Mark.ValueRef = {};
+    if (input.length === 1) // it's just '$' -- use the datum itself
+      val.field = 'data';
+    else
+      val.field = 'data.' + (<string>input).substring(1);
+    return enhance(cases => cases.ifVar(val));
+  }
 }
