@@ -20,6 +20,7 @@ var $win = $(window);
 var $chart = $('#chart');
 var $dummy = $('#dummy-chart');
 var $error = $('#error');
+var plot: Plot;
 var view: Vega.View;
 
 var codeMirror = CodeMirror.fromTextArea(<HTMLTextAreaElement>$('#input')[0], {
@@ -62,28 +63,28 @@ function setSize() {
 
 $win.resize(setSize);
 
-function makeChart(input: string) {
-  var plot: Plot;
+function makeChart(input: string): JQueryDeferred<void> {
+  var deferred = $.Deferred();
+
   try {
     var json = JsYaml.safeLoad(input);
-    // console.log('json input', JSON.stringify(json, null, 4));
+    var oldPlot = plot;
     plot = Parse.parse(json, config);
-  } catch (e) {
-    var err: Parse.Error = e;
-    $error.text('[' + ['spec'].concat(err.path).join('.') + '] ' + err.message);
-    return;
-  }
-  var result = vg.parse.spec({data: plot.data, marks: []}, chart => {
-    try {
-      plot.rtDataSets = chart({el:$dummy[0]})['_model']['_data'];
-      plot.data.forEach(set => {
-        if (set.url)
-          set.values = plot.rtDataSets[set.name].map(d => d['data']);
-      });
+
+    function innerParse() {
       Infer.infer(plot);
       var spec = Generate.genSpec(plot, config);
-      // console.log('generated', JSON.stringify(spec, null, 4));
+      spec.data.forEach(set => {
+        if (set.url) {
+          delete set.url;
+          delete set.format;
+          set.values = plot.rtDataSets[set.name].map(d => d['data']);
+        }
+      });
       vg.parse.spec(spec, chart => {
+        if (deferred.state() === 'rejected')
+          return;
+        deferred.resolve();
         $error.text('');
         view = chart({
           el: $chart[0],
@@ -91,15 +92,53 @@ function makeChart(input: string) {
         }).update();
         setSize();
       });
-    } catch (e) {
-      $error.text(e);
     }
-  });
+
+    if (oldPlot && _.isEqual(oldPlot.data, plot.data)) {
+      plot.rtDataSets = oldPlot.rtDataSets;
+      innerParse();
+    } else {
+      vg.parse.spec({data: plot.data, marks: []}, chart => {
+        if (deferred.state() === 'rejected')
+          return;
+        try {
+          plot.rtDataSets = chart({el:$dummy[0]})['_model']['_data'];
+          innerParse();
+        } catch (e) {
+          $error.text(e);
+          deferred.fail();
+        }
+      });
+    }
+  } catch (e) {
+    var err: Parse.Error = e;
+    $error.text('[' + ['spec'].concat(err.path).join('.') + '] ' + err.message);
+    deferred.fail();
+  }
+
+  return deferred;
 }
 
-codeMirror.on('change', editor => {
-  makeChart(editor.getDoc().getValue());
-});
+(function () {
+  var tid: number;
+  var dfd: JQueryDeferred<void>;
+  codeMirror.on('change', editor => {
+    if (tid) {
+      clearTimeout(tid);
+      tid = null;
+    }
+    if (dfd) {
+      dfd.reject();
+      dfd = null;
+    }
+    tid = setTimeout(() => {
+      dfd = makeChart(editor.getDoc().getValue()).always(() => {
+        tid = null;
+        dfd = null;
+      });
+    }, 500);
+  });
+})();
 
 $.ajax('examples/specs/diamonds.yaml', {dataType:'text'}).done(input => {
   codeMirror.getDoc().setValue(input);

@@ -49,7 +49,7 @@ export function genSpec(plot: Plot, config: Config): Vega.Spec {
   var scales = _.flatten(_.keys(plot.scales).map(scaleName => genScales(plot, scaleName)));
 
   return {
-    data: plot.data,
+    data: plot.data.map(set => _.clone(set)),
     scales: scales,
     axes: genAxes(scales),
     // legends: [
