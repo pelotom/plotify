@@ -107,11 +107,11 @@ export function redraw() {
 
     // Rewrite some aspects of the scale definitions so that updating the
     // view doesn't reset to the initial domain
-    var rootSceneItem = view['model']().scene().items[0];
+    var currentScales = view['model']().scene().items[0].scales;
     view['defs']().marks.scales.forEach((scale: Vega.Scale) => {
       scale.nice = false;
       scale.zero = false;
-      scale.domain = rootSceneItem.scales[scale.name].domain();
+      scale.domain = currentScales[scale.name].domain();
     });
 
     $chart.css({
