@@ -47,8 +47,13 @@ export function parse(input: any): Expr {
     var val: Vega.Mark.ValueRef = {};
     if (input.length === 1) // it's just '$' -- use the datum itself
       val.field = 'data';
-    else
-      val.field = 'data.' + (<string>input).substring(1);
+    else {
+      var rest = (<string>input).substring(1);
+      if (rest.indexOf('$') === 0) // $$ is used to access derived data
+        val.field = rest.substring(1);
+      else
+        val.field = 'data.' + rest;
+    }
     return enhance(cases => cases.ifVar(val));
   }
 }
