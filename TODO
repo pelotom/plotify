@@ -1,7 +1,9 @@
+- axis titles
+- legends
 - group support
 - facet support
-- legends
 - vertically centered labels
+- everything is an expression
 - ask each geom for its extents (right now aesthetics inferred by geoms don't go into calculating scales)
 - assume unrecognized layer-level properties are mapping properties
 - allow using ValueRefs to be explicit?
