@@ -1,0 +1,6 @@
+digraph {
+  rankdir = TB
+  plotifySpec [label = "Plotify spec (JSON)"]
+  vegaSpec [label = "Vega spec (JSON)"]
+  string -> plotifySpec -> vegaSpec
+}
