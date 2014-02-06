@@ -12,6 +12,7 @@ import Parse = require('./parse');
 import Infer = require('./infer');
 import Generate = require('./generate');
 import Zoom = require('./zoom');
+import sparsify = require('./sparsify');
 
 var config: Config = {
   geometries: Geoms.defaults
@@ -121,8 +122,14 @@ export function redraw() {
     view
       .width(viewWidth)
       .height(viewHeight)
-      .update()
       ;
+    
+    var v: any = view;
+    var model = v.model();
+    model.encode();
+    var group = model.scene().items[0];
+    sparsify(group);
+    view.render();
   }
 }
 
