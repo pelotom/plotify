@@ -47,7 +47,7 @@ function genAxes(scales: Vega.Scale[]) {
       type: s.name,
       scale: s.name,
       grid: s.type !== 'ordinal',
-      layer: 'back',
+      layer: 'front',
       properties: {
         grid: {
           stroke: { value: 'black' },
