@@ -161,7 +161,8 @@ export function redraw() {
       var items = node._itemsBackup = node.items;
       var isText = node.marktype === 'text';
       var inRangeTest = isText ? Culling.VisTest.RANGE_ENCLOSES : Culling.VisTest.RANGE_INTERSECTS;
-      items = Culling.filterVisible(items, node, inRangeTest);
+      if (['line', 'area'].indexOf(node.marktype) < 0)
+        items = Culling.filterVisible(items, node, inRangeTest);
       if (isText)
         items = Culling.filterOverlaps(items);
       node.items = items;
