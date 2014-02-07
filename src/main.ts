@@ -97,6 +97,27 @@ var codeMirror = CodeMirror.fromTextArea(<HTMLTextAreaElement>$('#input')[0], {
   });
 })();
 
+function computePadding(group) {
+  var TICK = 1;
+  var LABEL = 3;
+
+  function maxAxisMarkSize(markIdx, scaleIdx, dimension) {
+    var dimName = ['x', 'y'][dimension];
+    var labelNodes = group.axisItems[scaleIdx].items[0].items[markIdx].items;
+    return d3.max(labelNodes, (node:any) => {
+      var bounds = node.bounds;
+      return bounds[dimName + '2'] - bounds[dimName + '1'];
+    });
+  }
+
+  return {
+    top: maxAxisMarkSize(LABEL, 1, 1)/2,
+    left: maxAxisMarkSize(LABEL, 1, 0) + maxAxisMarkSize(TICK, 1, 0),
+    right: maxAxisMarkSize(LABEL, 0, 0)/2,
+    bottom: maxAxisMarkSize(LABEL, 0, 1) + maxAxisMarkSize(TICK, 1, 0)
+  };
+}
+
 export function redraw() {
   var ratio = 1/3;
   var w = $win.width() - 15;
@@ -109,28 +130,10 @@ export function redraw() {
     var model = v.model();
     var group = model.scene().items[0];
 
-    function axisWidth(scaleIdx) {
-      var otherIdx = (scaleIdx + 1)%2;
-      var scaleName = ['x', 'y'][scaleIdx];
-      var range: any = d3.extent(group.scales[scaleName].range());
-      var rangeSize = range[1] - range[0];
-      var axisBounds = group.axisItems[otherIdx].bounds;
-      var axisSize = axisBounds[scaleName + '2'] - axisBounds[scaleName + '1'];
-      if (spec.axes[otherIdx].grid)
-        return axisSize - rangeSize;
-      else
-        return axisSize;
-    }
-
-    var pad: Vega.Padding = {
-      top: 0,
-      left: axisWidth(0),
-      right: 10,
-      bottom: 20
-    };
+    var pad = computePadding(group);
     view.padding(pad);
 
-    var viewWidth = (1-ratio) * w - pad.left - pad.right;// - 20;
+    var viewWidth = (1-ratio) * w - pad.left - pad.right;
     var viewHeight = h - pad.top - pad.bottom;
 
     // Rewrite some aspects of the scale definitions so that updating the
@@ -214,7 +217,6 @@ function makeChart(input: string): JQueryDeferred<void> {
             el: $chart[0],
             renderer: 'canvas'
           }).update();
-          // view.padding().left += 20;
           setSize();
         });
       } catch (e) {
