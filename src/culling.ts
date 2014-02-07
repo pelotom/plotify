@@ -10,13 +10,17 @@ export enum VisTest {
   RANGE_ENCLOSES
 }
 
+function rangeExtent(scale) {
+  return scale.type === 'ordinal' ? [-Infinity, Infinity] : d3.extent(scale.range());
+}
+
 export function filterVisible(items, node, test?: VisTest) {
   if (!test)
     test = VisTest.RANGE_INTERSECTS;
   var scales = node.group.scales;
-  var xr = scales.x.range();
-  var yr = scales.y.range();
-  var range = new vg['Bounds']().set(d3.min(xr), d3.min(yr), d3.max(xr), d3.max(yr));
+  var xr = rangeExtent(scales.x);
+  var yr = rangeExtent(scales.y);
+  var range = new vg['Bounds']().set(xr[0], yr[0], xr[1], yr[1]);
   return items.filter(item => {
     var bounds = item.bounds;
     switch (test) {
