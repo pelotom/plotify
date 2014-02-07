@@ -3,6 +3,7 @@ declare var rbush: any;
 
 import _ = require('underscore');
 import vg = require('vega');
+import d3 = require('d3');
 
 export enum VisTest {
   RANGE_INTERSECTS,
@@ -15,13 +16,14 @@ export function filterVisible(items, node, test?: VisTest) {
   var scales = node.group.scales;
   var xr = scales.x.range();
   var yr = scales.y.range();
-  var range = new vg['Bounds']().set(xr[0], yr[0], xr[xr.length - 1], yr[yr.length - 1]);
+  var range = new vg['Bounds']().set(d3.min(xr), d3.min(yr), d3.max(xr), d3.max(yr));
   return items.filter(item => {
+    var bounds = item.bounds;
     switch (test) {
       case VisTest.RANGE_INTERSECTS:
-        return range.intersects(item.bounds);
+        return range.intersects(bounds);
       case VisTest.RANGE_ENCLOSES:
-        return range.encloses(item.bounds);
+        return range.encloses(bounds);
     }
   });
 }
