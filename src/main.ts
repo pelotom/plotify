@@ -5,6 +5,7 @@
 import $ = require('jquery');
 import _ = require('underscore');
 import vg = require('vega');
+import d3 = require('d3');
 import CodeMirror = require('codemirror');
 import JsYaml = require('js-yaml');
 import Geoms = require('./geometries');
@@ -24,6 +25,7 @@ var $chart = $('#chart');
 var $dummy = $('#dummy-chart');
 var $error = $('#error');
 var plot: Plot;
+var spec: Vega.Spec;
 var view: Vega.View;
 
 // Load the examples
@@ -97,16 +99,38 @@ var codeMirror = CodeMirror.fromTextArea(<HTMLTextAreaElement>$('#input')[0], {
 
 export function redraw() {
   var ratio = 1/3;
-  var w = $win.width();
+  var w = $win.width() - 15;
   var h = $win.height() - 60;
   codeMirror.setSize(ratio*w, h);
 
   if (view) {
-    var pad = view.padding();
-    var viewWidth = (1-ratio) * w - pad.left - pad.right - 20;
+    
     var v: any = view;
     var model = v.model();
     var group = model.scene().items[0];
+
+    function axisWidth(scaleIdx) {
+      var otherIdx = (scaleIdx + 1)%2;
+      var scaleName = ['x', 'y'][scaleIdx];
+      var range: any = d3.extent(group.scales[scaleName].range());
+      var rangeSize = range[1] - range[0];
+      var axisBounds = group.axisItems[otherIdx].bounds;
+      var axisSize = axisBounds[scaleName + '2'] - axisBounds[scaleName + '1'];
+      if (spec.axes[otherIdx].grid)
+        return axisSize - rangeSize;
+      else
+        return axisSize;
+    }
+
+    var pad: Vega.Padding = {
+      top: 0,
+      left: axisWidth(0),
+      right: 10,
+      bottom: 20
+    };
+    view.padding(pad);
+
+    var viewWidth = (1-ratio) * w - pad.left - pad.right;// - 20;
     var viewHeight = h - pad.top - pad.bottom;
 
     // Rewrite some aspects of the scale definitions so that updating the
@@ -190,7 +214,7 @@ function makeChart(input: string): JQueryDeferred<void> {
             el: $chart[0],
             renderer: 'canvas'
           }).update();
-          view.padding().left += 20;
+          // view.padding().left += 20;
           setSize();
         });
       } catch (e) {

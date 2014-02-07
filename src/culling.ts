@@ -2,7 +2,7 @@
 declare var rbush: any;
 
 import _ = require('underscore');
-import vg = require('./vega-patch');
+import vg = require('vega');
 
 export enum VisTest {
   RANGE_INTERSECTS,
@@ -15,7 +15,7 @@ export function filterVisible(items, node, test?: VisTest) {
   var scales = node.group.scales;
   var xr = scales.x.range();
   var yr = scales.y.range();
-  var range = new vg.Bounds().set(xr[0], yr[0], xr[xr.length - 1], yr[yr.length - 1]);
+  var range = new vg['Bounds']().set(xr[0], yr[0], xr[xr.length - 1], yr[yr.length - 1]);
   return items.filter(item => {
     switch (test) {
       case VisTest.RANGE_INTERSECTS:
