@@ -12,7 +12,7 @@ import Parse = require('./parse');
 import Infer = require('./infer');
 import Generate = require('./generate');
 import Zoom = require('./zoom');
-import sparsify = require('./sparsify');
+import Culling = require('./culling');
 
 var config: Config = {
   geometries: Geoms.defaults
@@ -104,11 +104,14 @@ export function redraw() {
   if (view) {
     var pad = view.padding();
     var viewWidth = (1-ratio) * w - pad.left - pad.right - 20;
+    var v: any = view;
+    var model = v.model();
+    var group = model.scene().items[0];
     var viewHeight = h - pad.top - pad.bottom;
 
     // Rewrite some aspects of the scale definitions so that updating the
     // view doesn't reset to the initial domain
-    var currentScales = view['model']().scene().items[0].scales;
+    var currentScales = group.scales;
     view['defs']().marks.scales.forEach((scale: Vega.Scale) => {
       scale.nice = false;
       scale.zero = false;
@@ -123,13 +126,27 @@ export function redraw() {
       .width(viewWidth)
       .height(viewHeight)
       ;
-    
-    var v: any = view;
-    var model = v.model();
+
     model.encode();
-    var group = model.scene().items[0];
-    sparsify(group);
+
+    // cull items that shouldn't be rendered
+    group.items.forEach(node => {
+      var items = node._itemsBackup = node.items;
+      var isText = node.marktype === 'text';
+      var inRangeTest = isText ? Culling.VisTest.RANGE_ENCLOSES : Culling.VisTest.RANGE_INTERSECTS;
+      items = Culling.filterVisible(items, node, inRangeTest);
+      if (isText)
+        items = Culling.filterOverlaps(items);
+      node.items = items;
+    });
+    
     view.render();
+
+    // restore culled items
+    group.items.forEach(node => {
+      node.items = node._itemsBackup;
+      delete node._itemsBackup;
+    });
   }
 }
 
