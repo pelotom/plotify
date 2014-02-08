@@ -130,7 +130,7 @@ export function redraw() {
     var model = v.model();
     var group = model.scene().items[0];
 
-    var pad = computePadding(group);
+    var pad = _.extend(view.padding(), computePadding(group));
     view.padding(pad);
 
     var viewWidth = (1-ratio) * w - pad.left - pad.right;
