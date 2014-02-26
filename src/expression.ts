@@ -44,7 +44,7 @@ export function parse(input: any): Expr {
   if (typeof input !== 'string' || input.indexOf('$') !== 0)
     return enhance(cases => cases.ifConst({val: input}));
   else {
-    var val: Vega.Mark.ValueRef = {};
+    var val: Vega.ValueRef = {};
     if (input.length === 1) // it's just '$' -- use the datum itself
       val.field = 'data';
     else {

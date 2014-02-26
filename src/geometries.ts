@@ -3,7 +3,7 @@
 import _ = require('underscore');
 import U = require('./util');
 
-export function mkMark(type: string, set: Vega.Mark.PropertySet) {
+export function mkMark(type: string, set: Vega.PropertySet) {
   return {
     type: type,
     properties: { update: set }
@@ -24,7 +24,7 @@ var vegaTypes = [
 ];
 
 _.each(vegaTypes, type => {
-  var defaultVals:{[geom:string]:Vega.Mark.ValueRef} = {
+  var defaultVals:{[geom:string]:Vega.ValueRef} = {
     rect: {
       fill: U.mkVal('black')
     },
@@ -50,7 +50,7 @@ _.each(vegaTypes, type => {
     generate: args => {
       var data = args.data;
       var mapping = args.mapping;
-      var set: Vega.Mark.PropertySet = {};
+      var set: Vega.PropertySet = {};
       _.each(U.basicAesthetics, aes => {
         var val = U.mkVar(mapping, aes);
         if (typeof val !== 'undefined')
@@ -80,7 +80,7 @@ defaults['bar'] = {
     var data = args.data;
     var mapping = args.mapping;
     var isCat = args.isCategorical;
-    var set: Vega.Mark.PropertySet = _.extend({}, defaults['rect'].generate(args).properties.update);
+    var set: Vega.PropertySet = _.extend({}, defaults['rect'].generate(args).properties.update);
     set.x = U.mkVar(mapping, 'x');
     set.y = U.mkVar(mapping, 'y');
     var xScale = 'x', yScale = 'y';

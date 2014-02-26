@@ -120,24 +120,24 @@ function rangeFor(aesthetic: string) {
   return scaleInfos[scale];
 }
 
-export function mkVal(v: any): Vega.Mark.ValueRef {
+export function mkVal(v: any): Vega.ValueRef {
   return { value: v };
 }
 
-export function mkVar(mapping: Mapping, aesthetic: string): Vega.Mark.ValueRef {
+export function mkVar(mapping: Mapping, aesthetic: string): Vega.ValueRef {
   if (aesthetic in mapping) {
     var mappedTo: string = mapping[aesthetic];
     var scale = scaleFor(aesthetic);
 
     return E.parse(mappedTo).match({
       ifConst: (c: E.Const) => {
-        var valRef: Vega.Mark.ValueRef = mkVal(c.val);
+        var valRef: Vega.ValueRef = mkVal(c.val);
         if (scale === 'x' || scale === 'y')
           valRef.scale = scale;
         return valRef;
       },
       ifVar: (v: E.Var) => {
-        var valRef: Vega.Mark.ValueRef = { field: v.field };
+        var valRef: Vega.ValueRef = { field: v.field };
         if (scale)
           valRef.scale = scale;
         return valRef;

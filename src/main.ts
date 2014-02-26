@@ -97,14 +97,14 @@ var codeMirror = CodeMirror.fromTextArea(<HTMLTextAreaElement>$('#input')[0], {
   });
 })();
 
-function computePadding(group) {
+function computePadding(group: Vega.Node) {
   var TICK = 1;
   var LABEL = 3;
 
   function maxAxisMarkSize(markIdx, scaleIdx, dimension) {
     var dimName = ['x', 'y'][dimension];
     var labelNodes = group.axisItems[scaleIdx].items[0].items[markIdx].items;
-    return d3.max(labelNodes, (node:any) => {
+    return d3.max(labelNodes, node => {
       var bounds = node.bounds;
       return bounds[dimName + '2'] - bounds[dimName + '1'];
     });
@@ -125,9 +125,7 @@ export function redraw() {
   codeMirror.setSize(ratio*w, h);
 
   if (view) {
-    
-    var v: any = view;
-    var model = v.model();
+    var model = view.model();
     var group = model.scene().items[0];
 
     var pad = _.extend(view.padding(), computePadding(group));
@@ -139,7 +137,7 @@ export function redraw() {
     // Rewrite some aspects of the scale definitions so that updating the
     // view doesn't reset to the initial domain
     var currentScales = group.scales;
-    view['defs']().marks.scales.forEach((scale: Vega.Scale) => {
+    view.defs().marks.scales.forEach(scale => {
       scale.nice = false;
       scale.zero = false;
       scale.domain = currentScales[scale.name].domain();
@@ -158,7 +156,7 @@ export function redraw() {
 
     // cull items that shouldn't be rendered
     group.items.forEach(node => {
-      var items = node._itemsBackup = node.items;
+      var items = node['_itemsBackup'] = node.items;
       var isText = node.marktype === 'text';
       var inRangeTest = isText ? Culling.VisTest.RANGE_ENCLOSES : Culling.VisTest.RANGE_INTERSECTS;
       if (['line', 'area'].indexOf(node.marktype) < 0)
@@ -172,8 +170,8 @@ export function redraw() {
 
     // restore culled items
     group.items.forEach(node => {
-      node.items = node._itemsBackup;
-      delete node._itemsBackup;
+      node.items = node['_itemsBackup'];
+      delete node['_itemsBackup'];
     });
   }
 }
@@ -233,7 +231,7 @@ function makeChart(input: string): JQueryDeferred<void> {
       vg.parse.spec({data: plot.data, marks: []}, chart => {
         if (deferred.state() === 'rejected')
           return;
-          plot.rtDataSets = chart({el:$dummy[0]})['_model']['_data'];
+          plot.rtDataSets = chart({el:$dummy[0]}).model().data();
           innerParse();
       });
     }
