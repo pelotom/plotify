@@ -4,7 +4,7 @@
 
 import $ = require('jquery');
 import _ = require('underscore');
-import vg = require('vega');
+import vg = require('./vega-patch');
 import d3 = require('d3');
 import CodeMirror = require('codemirror');
 import JsYaml = require('js-yaml');

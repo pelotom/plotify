@@ -1,5 +1,6 @@
 /// <reference path="declarations"/>
 
+import $ = require('jquery');
 import _ = require('underscore');
 import d3 = require('d3');
 import U = require('./util');
@@ -26,6 +27,9 @@ export function inferScale(plot: Plot, scaleName: string): Scale {
     // categorical
     scale.type = 'ordinal';
     scale.domain = vals;
+  } else if (_.every(vals, v => $.type(v) === 'date')) {
+    scale.type = 'time';
+    scale.domain = d3.extent(vals).map(v => v['getTime']());
   } else {
     scale.type = 'linear';
     scale.domain = d3.extent(vals);
