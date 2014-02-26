@@ -27,6 +27,7 @@ var $error = $('#error');
 var plot: Plot;
 var spec: Vega.Spec;
 var view: Vega.View;
+var dataParse;
 
 // Load the examples
 $.get('examples/specs/').then(html => {
@@ -200,24 +201,23 @@ function makeChart(input: string): JQueryDeferred<void> {
       try {
         Infer.infer(plot);
         var spec = Generate.genSpec(plot, config);
-        spec.data.forEach(set => {
-          if (set.url) {
-            delete set.url;
-            delete set.format;
-            set.values = plot.rtDataSets[set.name].map(d => d['data']);
-          }
+        var width = spec.width || 500;
+        var height = spec.height || 500;
+        var chart = vg.ViewFactory({
+          width: width,
+          height: height,
+          viewport: spec.viewport || null,
+          padding: vg.parse.padding(spec.padding),
+          marks: vg.parse.marks(spec, width, height),
+          data: dataParse
         });
-        vg.parse.spec(spec, chart => {
-          if (deferred.state() === 'rejected')
-            return;
-          deferred.resolve();
-          $error.text('');
-          view = chart({
-            el: $chart[0],
-            renderer: 'canvas'
-          }).update();
-          setSize();
-        });
+        deferred.resolve();
+        $error.text('');
+        view = chart({
+          el: $chart[0],
+          renderer: 'canvas'
+        }).update();
+        setSize();
       } catch (e) {
         $error.text(e);
         deferred.fail();
@@ -228,11 +228,11 @@ function makeChart(input: string): JQueryDeferred<void> {
       plot.rtDataSets = oldPlot.rtDataSets;
       innerParse();
     } else {
-      vg.parse.spec({data: plot.data, marks: []}, chart => {
+      dataParse = vg.parse.data(plot.data, () => {
         if (deferred.state() === 'rejected')
           return;
-          plot.rtDataSets = chart({el:$dummy[0]}).model().data();
-          innerParse();
+        plot.rtDataSets = new vg.View().defs({data: dataParse}).data(dataParse.load).data();
+        innerParse();
       });
     }
   } catch (e) {
