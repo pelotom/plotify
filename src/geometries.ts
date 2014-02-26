@@ -39,7 +39,8 @@ _.each(vegaTypes, type => {
     text: {
       fill: U.mkVal('black'),
       text: U.mkVal('label'),
-      baseline: U.mkVal('middle')
+      baseline: U.mkVal('middle'),
+      dx: U.mkVal(3)
     },
     area: {
       x2: {scale: 'x', value: 0},
