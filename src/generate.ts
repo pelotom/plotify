@@ -28,7 +28,7 @@ function genScales(plot: Plot, scaleName: string): Vega.Scale[] {
       points: false
     }));
     vegaScale.points = true;
-    vegaScale.padding = 1.0;
+    vegaScale.padding = 1.65;
   }
   return results;
 }
