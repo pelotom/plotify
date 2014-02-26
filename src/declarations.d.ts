@@ -3,6 +3,7 @@
 /// <reference path="../typings/d3/d3"/>
 /// <reference path="../typings/vega/vega"/>
 /// <reference path="../typings/codemirror/codemirror"/>
+/// <reference path="../typings/moment/moment"/>
 
 declare module 'd3' {
   export = d3;
@@ -18,6 +19,10 @@ declare module 'codemirror' {
 
 declare module 'js-yaml' {
   export function safeLoad(input, options?);
+}
+
+declare module 'moment' {
+  export = moment;
 }
 
 // Spec format
